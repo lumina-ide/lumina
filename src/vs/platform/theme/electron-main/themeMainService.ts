@@ -18,9 +18,9 @@ import { coalesce } from '../../../base/common/arrays.js';
 import { getAllWindowsExcludingOffscreen } from '../../windows/electron-main/windows.js';
 
 // These default colors match our default themes
-// editor background color ("Dark Modern", etc...)
+// editor background color ("Lumina Dark")
 const DEFAULT_BG_LIGHT = '#FFFFFF';
-const DEFAULT_BG_DARK = '#1F1F1F';
+const DEFAULT_BG_DARK = '#070f1c'; // Lumina Dark background
 const DEFAULT_BG_HC_BLACK = '#000000';
 const DEFAULT_BG_HC_LIGHT = '#FFFFFF';
 

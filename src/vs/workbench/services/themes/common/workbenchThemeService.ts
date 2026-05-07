@@ -39,7 +39,7 @@ export enum ThemeSettings {
 }
 
 export enum ThemeSettingDefaults {
-	COLOR_THEME_DARK = 'Default Dark+', // Void changed this from 'Default Dark Modern'
+	COLOR_THEME_DARK = 'Lumina Dark', // Lumina changed this - Lumina brand theme
 	COLOR_THEME_LIGHT = 'Default Light Modern',
 	COLOR_THEME_HC_DARK = 'Default High Contrast',
 	COLOR_THEME_HC_LIGHT = 'Default High Contrast Light',
@@ -51,31 +51,56 @@ export enum ThemeSettingDefaults {
 	PRODUCT_ICON_THEME = 'Default',
 }
 
-export const COLOR_THEME_DARK_INITIAL_COLORS = { // Void changed this to match dark+
-	'activityBar.activeBorder': '#ffffff',
-	'activityBar.background': '#333333',
-	'activityBar.border': '#454545',
-	'activityBar.foreground': '#ffffff',
-	'activityBar.inactiveForeground': '#ffffff66',
-	'editorGroup.border': '#444444',
-	'editorGroupHeader.tabsBackground': '#252526',
-	'editorGroupHeader.tabsBorder': '#252526',
-	'statusBar.background': '#007ACC',
-	'statusBar.border': '#454545',
-	'statusBar.foreground': '#ffffff',
-	'statusBar.noFolderBackground': '#68217A',
-	'tab.activeBackground': '#2D2D2D',
-	'tab.activeBorder': '#ffffff',
-	'tab.activeBorderTop': '#007ACC',
-	'tab.activeForeground': '#ffffff',
-	'tab.border': '#252526',
-	'textLink.foreground': '#3794ff',
-	'titleBar.activeBackground': '#3C3C3C',
-	'titleBar.activeForeground': '#CCCCCC',
-	'titleBar.border': '#454545',
-	'titleBar.inactiveBackground': '#2C2C2C',
-	'titleBar.inactiveForeground': '#999999',
-	'welcomePage.tileBackground': '#252526'
+export const COLOR_THEME_DARK_INITIAL_COLORS = { // Void changed this - Neuronal brand theme
+	// Activity bar
+	'activityBar.activeBorder': '#00c8f0',
+	'activityBar.background': '#050d1a',
+	'activityBar.border': '#0a1628',
+	'activityBar.foreground': '#00c8f0',
+	'activityBar.inactiveForeground': '#2a4a60',
+	// Editor groups
+	'editorGroup.border': '#0f1e35',
+	'editorGroupHeader.tabsBackground': '#050d1a',
+	'editorGroupHeader.tabsBorder': '#050d1a',
+	// Status bar - dark and subtle
+	'statusBar.background': '#050d1a',
+	'statusBar.border': '#0a1628',
+	'statusBar.foreground': '#2a4a60',
+	'statusBar.noFolderBackground': '#050d1a',
+	// Tabs
+	'tab.activeBackground': '#0a1628',
+	'tab.activeBorder': '#0a1628',
+	'tab.activeBorderTop': '#00c8f0',
+	'tab.activeForeground': '#c8dce8',
+	'tab.border': '#050d1a',
+	'tab.inactiveBackground': '#050d1a',
+	'tab.inactiveForeground': '#2a4a60',
+	// Links
+	'textLink.foreground': '#00c8f0',
+	// Title bar
+	'titleBar.activeBackground': '#050d1a',
+	'titleBar.activeForeground': '#7ab8cc',
+	'titleBar.border': '#0a1628',
+	'titleBar.inactiveBackground': '#050d1a',
+	'titleBar.inactiveForeground': '#2a4a60',
+	// Sidebar
+	'sideBar.background': '#050d1a',
+	'sideBar.border': '#0a1628',
+	'sideBar.foreground': '#7ab8cc',
+	'sideBarSectionHeader.background': '#050d1a',
+	'sideBarSectionHeader.border': '#0a1628',
+	// Panel
+	'panel.background': '#050d1a',
+	'panel.border': '#0a1628',
+	'panelTitle.activeBorder': '#00c8f0',
+	'panelTitle.activeForeground': '#c8dce8',
+	'panelTitle.inactiveForeground': '#2a4a60',
+	// Editor
+	'editor.background': '#070f1c',
+	'editorLineNumber.foreground': '#1e3550',
+	'editorLineNumber.activeForeground': '#00c8f080',
+	// Welcome
+	'welcomePage.tileBackground': '#0a1628'
 };
 
 export const COLOR_THEME_LIGHT_INITIAL_COLORS = {

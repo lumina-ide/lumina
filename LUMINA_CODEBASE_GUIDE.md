@@ -1,12 +1,10 @@
-# Void Codebase Guide
+# Lumina Codebase Guide
 
-The Void codebase is not as intimidating as it seems!
+The Lumina codebase is not as intimidating as it seems!
 
-Most of Void's code lives in the folder `src/vs/workbench/contrib/void/`.
+Most of Lumina's code lives in the folder `src/vs/workbench/contrib/Lumina/`.
 
-The purpose of this document is to explain how Void's codebase works. If you want build instructions instead, see [Contributing](https://github.com/voideditor/void/blob/main/HOW_TO_CONTRIBUTE.md).
-
-
+The purpose of this document is to explain how Lumina's codebase works. If you want build instructions instead, see [Contributing](https://github.com/Luminaeditor/Lumina/blob/main/HOW_TO_CONTRIBUTE.md).
 
 
 
@@ -14,10 +12,12 @@ The purpose of this document is to explain how Void's codebase works. If you wan
 
 
 
-## Void Codebase Guide
+
+
+## Lumina Codebase Guide
 
 ### VSCode Rundown
-Here's a VSCode rundown if you're just getting started with Void. You can also see Microsoft's [wiki](https://github.com/microsoft/vscode/wiki/Source-Code-Organization) for some pictures. VSCode is an Electron app. Electron runs two processes: a **main** process (for internals) and a **browser** process (browser means HTML in general, not just "web browser").
+Here's a VSCode rundown if you're just getting started with Lumina. You can also see Microsoft's [wiki](https://github.com/microsoft/vscode/wiki/Source-Code-Organization) for some pictures. VSCode is an Electron app. Electron runs two processes: a **main** process (for internals) and a **browser** process (browser means HTML in general, not just "web browser").
 <p align="center" >
 <img src="https://github.com/user-attachments/assets/eef80306-2bfe-4cac-ba15-6156f65ab3bb" alt="Credit - https://github.com/microsoft/vscode/wiki/Source-Code-Organization" width="700px">
 </p>
@@ -54,8 +54,8 @@ Here's some terminology you might want to know about when working inside VSCode:
 
 ### Internal LLM Message Pipeline
 
-Here's a picture of all the dependencies that are relevent between the time you first send a message through Void's sidebar, and the time a request is sent to your provider.
-Sending LLM messages from the main process avoids CSP issues with local providers and lets us use node_modules more easily.
+Here's a picture of all the dependencies that are relevent between the time you first send a message through Lumina's sidebar, and the time a request is sent to your provider.
+Sending LLM messages from the main process aLuminas CSP issues with local providers and lets us use node_modules more easily.
 
 
 <div align="center">
@@ -69,7 +69,7 @@ Sending LLM messages from the main process avoids CSP issues with local provider
 
 ### Apply
 
-Void has two types of Apply: **Fast Apply** (uses Search/Replace, see below), and **Slow Apply** (rewrites whole file).
+Lumina has two types of Apply: **Fast Apply** (uses Search/Replace, see below), and **Slow Apply** (rewrites whole file).
 
 When you click Apply and Fast Apply is enabled, we prompt the LLM to output Search/Replace block(s) like this:
 ```
@@ -79,7 +79,7 @@ When you click Apply and Fast Apply is enabled, we prompt the LLM to output Sear
 // replaced code goes here
 >>>>>>> UPDATED
 ```
-This is what allows Void to quickly apply code even on 1000-line files. It's the same as asking the LLM to press Ctrl+F and enter in a search/replace query.
+This is what allows Lumina to quickly apply code even on 1000-line files. It's the same as asking the LLM to press Ctrl+F and enter in a search/replace query.
 
 ### Apply Inner Workings
 
@@ -97,10 +97,10 @@ How Apply works:
 
 
 ### Writing Files Inner Workings
-When Void wants to change your code, it just writes to a text model. This means all you need to know to write to a file is its URI - you don't have to load it, save it, etc. There are some annoying background URI/model things to think about to get this to work, but we handled them all in `voidModelService`.
+When Lumina wants to change your code, it just writes to a text model. This means all you need to know to write to a file is its URI - you don't have to load it, save it, etc. There are some annoying background URI/model things to think about to get this to work, but we handled them all in `LuminaModelService`.
 
-### Void Settings Inner Workings
-We have a service `voidSettingsService` that stores all your Void settings (providers, models, global Void settings, etc). Imagine this as an implicit dependency for any of the core Void services:
+### Lumina Settings Inner Workings
+We have a service `LuminaSettingsService` that stores all your Lumina settings (providers, models, global Lumina settings, etc). Imagine this as an implicit dependency for any of the core Lumina services:
 
 <div align="center">
 	<img width="800" src="https://github.com/user-attachments/assets/9f3cb68c-a61b-4810-8429-bb90b992b3fa">
@@ -126,13 +126,13 @@ Here's a guide to some of the terminology we're using:
 
 
 ### Build process
-If you want to know how our build pipeline works, see our build repo [here](https://github.com/voideditor/void-builder).
+If you want to know how our build pipeline works, see our build repo [here](https://github.com/Luminaeditor/Lumina-builder).
 
 
 
 ## VSCode Codebase Guide
 
-For additional references, the Void team put together this list of links to get up and running with VSCode.
+For additional references, the Lumina team put together this list of links to get up and running with VSCode.
 <details>
 	
 
@@ -155,7 +155,7 @@ For additional references, the Void team put together this list of links to get 
 
 #### VSCode's Extension API
 
-Void is no longer an extension, so these links are no longer required, but they might be useful if we ever build an extension again.
+Lumina is no longer an extension, so these links are no longer required, but they might be useful if we ever build an extension again.
 
 - [Files you need in an extension](https://code.visualstudio.com/api/get-started/extension-anatomy).
 - [An extension's `package.json` schema](https://code.visualstudio.com/api/references/extension-manifest).

@@ -1,0 +1,40 @@
+{
+  "name": "theme-lumina",
+  "displayName": "Lumina Theme",
+  "description": "Lumina dark theme — deep navy background with cyan and violet accents.",
+  "categories": [
+    "Themes"
+  ],
+  "version": "1.0.0",
+  "publisher": "lumina",
+  "license": "MIT",
+  "engines": {
+    "vscode": "*"
+  },
+  "contributes": {
+    "themes": [
+      {
+        "id": "Lumina Dark",
+        "label": "Lumina Dark",
+        "uiTheme": "vs-dark",
+        "path": "./themes/neuronal_dark.json"
+      },
+      {
+        "id": "Lumina Cyberpunk",
+        "label": "Lumina Cyberpunk",
+        "uiTheme": "vs-dark",
+        "path": "./themes/lumina_cyberpunk.json"
+      },
+      {
+        "id": "Lumina Light",
+        "label": "Lumina Light",
+        "uiTheme": "vs",
+        "path": "./themes/lumina_light.json"
+      }
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lumina-ide/lumina.git"
+  }
+}

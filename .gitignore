@@ -22,9 +22,62 @@ product.overrides.json
 *.snap.actual
 .vscode-test
 
-# Void added these:
+# Lumina — build artifacts
 .tmp/
 .tmp2/
 .tool-versions
 src/vs/workbench/contrib/void/browser/react/out/**
 src/vs/workbench/contrib/void/browser/react/src2/**
+
+# Lumina — logs
+*.log
+logs/
+*.pid
+
+# Lumina — OS artifacts
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Lumina — editor artifacts
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.swp
+*.swo
+*~
+
+# Lumina — environment & secrets
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+
+# Lumina — distribution output (local builds)
+VSCode-*/
+*.exe
+*.dmg
+*.deb
+*.rpm
+*.AppImage
+*.snap
+*.zip
+*.tar.gz
+*.tar.bz2
+
+# Lumina — telemetry & crash reports
+crashpad/
+*.dmp
+*.crash
+
+# Lumina — author info (private)
+.mailmap
+AUTHORS
+CONTRIBUTORS

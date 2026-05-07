@@ -677,12 +677,12 @@ for (const menuId of [MenuId.EmptyEditorGroupContext, MenuId.EditorTabsBarContex
 // File menu
 
 
-// Void added this:
+// Lumina added this:
 MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {
-	group: '0_void',
+	group: '0_lumina',
 	command: {
 		id: VOID_OPEN_SETTINGS_ACTION_ID,
-		title: nls.localize({ key: 'openVoid', comment: ['&& denotes a mnemonic'] }, "&&Open Void Settings"),
+		title: nls.localize({ key: 'openLumina', comment: ['&& denotes a mnemonic'] }, "&&Open Lumina Settings"),
 	},
 	order: 1
 });

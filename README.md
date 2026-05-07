@@ -1,41 +1,32 @@
-# Welcome to Void.
+# Welcome to Lumina.
 
 <div align="center">
 	<img
-		src="./src/vs/workbench/browser/parts/editor/media/slice_of_void.png"
-	 	alt="Void Welcome"
+		src="./resources/win32/logo_cube_noshadow.png"
+		alt="Lumina Welcome"
 		width="300"
-	 	height="300"
+		height="300"
 	/>
 </div>
 
-Void is the open-source Cursor alternative.
+Lumina is an open-source AI-powered code editor by [Neuronal](https://neuronal.ai).
 
-Use AI agents on your codebase, checkpoint and visualize changes, and bring any model or host locally. Void sends messages directly to providers without retaining your data.
+Use AI agents on your codebase, checkpoint and visualize changes, and bring any model or host locally. Lumina sends messages directly to providers without retaining your data.
 
-This repo contains the full sourcecode for Void. If you're new, welcome!
+This repo contains the full source code for Lumina. If you're new, welcome!
 
-- 🧭 [Website](https://voideditor.com)
-
-- 👋 [Discord](https://discord.gg/RSNjgaugJs)
-
-- 🚙 [Project Board](https://github.com/orgs/voideditor/projects/2)
-
-
-## Note
-
-We've paused work on the Void IDE (this repo) to explore a few novel coding ideas. We want to focus on innovation over feature-parity. Void will continue running, but without maintenance some existing features might stop working over time. Depending on the direction of our new work, we might not resume Void as an IDE.
-
-We won't be actively reviewing Issues and PRs, but we will respond to all [email](mailto:hello@voideditor.com) inquiries on building and maintaining your own version of Void while we're paused. 
+- 🧭 [Website](https://neuronal.ai)
+- 👋 Discord (coming soon)
+- 🚙 [Issues](https://github.com/lumina-ide/lumina/issues)
 
 ## Reference
 
-Void is a fork of the [vscode](https://github.com/microsoft/vscode) repository. For a guide to the codebase, see [VOID_CODEBASE_GUIDE](https://github.com/voideditor/void/blob/main/VOID_CODEBASE_GUIDE.md).
+Lumina is a fork of [Void](https://github.com/voideditor/void), which is itself a fork of [vscode](https://github.com/microsoft/vscode).
 
-For a guide on how to develop your own version of Void, see [HOW_TO_CONTRIBUTE](https://github.com/voideditor/void/blob/main/HOW_TO_CONTRIBUTE.md) and [void-builder](https://github.com/voideditor/void-builder).
+For a guide to the codebase, see [LUMINA_CODEBASE_GUIDE](./LUMINA_CODEBASE_GUIDE.md).
 
-
-
+For build instructions, see [BUILDING](./BUILDING.md).
 
 ## Support
-You can always reach us in our Discord server or contact us via email: hello@voideditor.com.
+
+Contact us via email: hello@neuronal.ai

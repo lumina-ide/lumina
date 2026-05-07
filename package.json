@@ -263,10 +263,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/microsoft/vscode.git"
+    "url": "https://github.com/lumina-ide/lumina.git"
   },
   "bugs": {
-    "url": "https://github.com/microsoft/vscode/issues"
+    "url": "https://github.com/lumina-ide/lumina/issues"
   },
   "optionalDependencies": {
     "windows-foreground-love": "0.5.0"

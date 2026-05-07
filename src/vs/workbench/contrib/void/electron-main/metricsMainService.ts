@@ -99,7 +99,7 @@ export class MetricsMainService extends Disposable implements IMetricsService {
 		// very important to await whenReady!
 		await this._appStorage.whenReady
 
-		const { commit, version, voidVersion, release, quality } = this._productService
+		const { commit, version, luminaVersion, release, quality } = this._productService
 
 		const isDevMode = !this._envMainService.isBuilt // found in abstractUpdateService.ts
 
@@ -107,7 +107,7 @@ export class MetricsMainService extends Disposable implements IMetricsService {
 		this._initProperties = {
 			commit,
 			vscodeVersion: version,
-			voidVersion: voidVersion,
+			luminaVersion: luminaVersion,
 			release,
 			os,
 			quality,
@@ -135,7 +135,7 @@ export class MetricsMainService extends Disposable implements IMetricsService {
 		}
 
 
-		console.log('Void posthog metrics info:', JSON.stringify(identifyMessage, null, 2))
+		console.log('Lumina posthog metrics info:', JSON.stringify(identifyMessage, null, 2))
 	}
 
 
