@@ -1,6 +1,6 @@
-# Building Void
+# Building Lumina
 
-Guia prático para compilar e rodar o Void em modo de desenvolvimento.
+Guia prático para compilar e rodar o Lumina em modo de desenvolvimento.
 
 ---
 
@@ -73,7 +73,7 @@ São necessários **três processos** rodando simultaneamente. Abra três termin
 node --max-old-space-size=8192 ./node_modules/gulp/bin/gulp.js watch-client
 ```
 
-Compila todo o TypeScript do VSCode/Void. A primeira compilação leva ~6-7 minutos. Após isso fica em modo watch.
+Compila todo o TypeScript do Lumina. A primeira compilação leva ~6-7 minutos. Após isso fica em modo watch.
 
 ### Terminal 2 — watch-extensions (extensões built-in)
 
@@ -83,7 +83,7 @@ node --max-old-space-size=8192 ./node_modules/gulp/bin/gulp.js watch-extensions 
 
 Compila as extensões built-in. A primeira compilação leva ~3 minutos.
 
-### Terminal 3 — Void (janela do editor)
+### Terminal 3 — Lumina (janela do editor)
 
 Aguarde os dois watchers acima mostrarem `Finished compilation with 0 errors` antes de abrir.
 
@@ -97,11 +97,11 @@ Aguarde os dois watchers acima mostrarem `Finished compilation with 0 errors` an
 
 As flags `--user-data-dir` e `--extensions-dir` isolam o estado do editor de desenvolvimento. Para resetar, basta deletar a pasta `.tmp/`.
 
-> Para ver mudanças no código: pressione `Ctrl+R` (ou `Cmd+R` no Mac) dentro da janela do Void.
+> Para ver mudanças no código: pressione `Ctrl+R` (ou `Cmd+R` no Mac) dentro da janela do Lumina.
 
-### Atalho (VSCode/Void)
+### Atalho (VSCode/Lumina)
 
-Alternativamente, pressione `Ctrl+Shift+B` (ou `Cmd+Shift+B` no Mac) dentro do VSCode/Void para iniciar os watchers automaticamente via task.
+Alternativamente, pressione `Ctrl+Shift+B` (ou `Cmd+Shift+B` no Mac) dentro do VSCode/Lumina para iniciar os watchers automaticamente via task.
 
 ---
 
@@ -130,9 +130,9 @@ NODE_OPTIONS="--max-old-space-size=8192" npm run buildreact
 
 ---
 
-## Onde fica o código do Void
+## Onde fica o código do Lumina
 
-Todo o código específico do Void (não VSCode base) está em:
+Todo o código específico do Lumina (não VSCode base) está em:
 
 ```
 src/vs/workbench/contrib/void/
@@ -144,12 +144,32 @@ src/vs/workbench/contrib/void/
 
 ---
 
-## Compilação de produção (executável)
+## Gerando o instalador Windows
 
-Gera um instalador completo (~25 min):
+Use o script que automatiza os três passos necessários:
 
 ```bash
-npm run gulp vscode-win32-x64      # Windows
+.\scripts\build-installer-win32-x64.bat
+```
+
+O script executa em sequência:
+1. `gulp vscode-win32-x64` — build completo (~25 min)
+2. `gulp vscode-win32-x64-inno-updater` — copia as ferramentas de update
+3. `gulp vscode-win32-x64-user-setup` — gera o instalador
+
+**Saída:** `.build\win32-x64\user-setup\Lumina-win32-x64-user-setup.exe`
+
+> **Atenção:** Não rode `vscode-win32-x64-user-setup` diretamente sem antes rodar o `inno-updater` — a pasta `tools/` é apagada a cada build e precisa ser repopulada.
+
+Se quiser o instalador system-wide (requer admin):
+```bash
+npm run gulp vscode-win32-x64-inno-updater
+npm run gulp vscode-win32-x64-system-setup
+```
+
+### Outras plataformas (apenas portátil, sem instalador)
+
+```bash
 npm run gulp vscode-darwin-arm64   # macOS Apple Silicon
 npm run gulp vscode-darwin-x64     # macOS Intel
 npm run gulp vscode-linux-x64      # Linux
@@ -166,6 +186,7 @@ npm run gulp vscode-linux-x64      # Linux
 | Erro no build do React | `NODE_OPTIONS="--max-old-space-size=8192" npm run buildreact` |
 | Estilos não aparecem | Aguarde alguns segundos e recarregue com `Ctrl+R` |
 | Erro de `dynamic import` | Verifique se todos os imports terminam com `.js` |
+| `tools/` não encontrado no instalador | Execute `npm run gulp vscode-win32-x64-inno-updater` antes do setup |
 | Sandbox no Linux | `sudo chown root:root .build/electron/chrome-sandbox && sudo chmod 4755 .build/electron/chrome-sandbox` |
 | `libtool` no macOS | Use GNU libtool em vez do BSD libtool |
 
