@@ -119,8 +119,7 @@ const newOpenAICompatibleSDK = async ({ settingsOfProvider, providerName, includ
 		const thisConfig = settingsOfProvider[providerName]
 		const endpoint = `https://${thisConfig.project}.openai.azure.com/`;
 		const apiVersion = thisConfig.azureApiVersion ?? '2024-04-01-preview';
-		const options = { endpoint, apiKey: thisConfig.apiKey, apiVersion };
-		return new AzureOpenAI({ ...options, ...commonPayloadOpts });
+                return new AzureOpenAI({ endpoint, apiKey: thisConfig.apiKey, apiVersion, dangerouslyAllowBrowser: (commonPayloadOpts as any).dangerouslyAllowBrowser } as any);
 	}
 	else if (providerName === 'awsBedrock') {
 		/**

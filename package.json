@@ -72,10 +72,10 @@
     "update-build-ts-version": "npm install typescript@next && tsc -p ./build/tsconfig.build.json"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.40.0",
+    "@anthropic-ai/sdk": "^0.62.0",
     "@c4312/eventsource-umd": "^3.0.5",
     "@floating-ui/react": "^0.27.8",
-    "@google/genai": "^0.13.0",
+    "@google/genai": "^1.20.0",
     "@microsoft/1ds-core-js": "^3.2.13",
     "@microsoft/1ds-post-js": "^3.2.13",
     "@mistralai/mistralai": "^1.6.0",
@@ -110,7 +110,7 @@
     "diff": "^7.0.0",
     "eslint-plugin-react": "^7.37.5",
     "google-auth-library": "^9.15.1",
-    "groq-sdk": "^0.20.1",
+    "groq-sdk": "^0.32.0",
     "http-proxy-agent": "^7.0.0",
     "https-proxy-agent": "^7.0.2",
     "jschardet": "3.1.4",
@@ -124,7 +124,7 @@
     "node-pty": "^1.1.0-beta33",
     "ollama": "^0.5.15",
     "open": "^8.4.2",
-    "openai": "^4.96.0",
+    "openai": "^5.20.0",
     "posthog-node": "^4.14.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -272,3 +272,5 @@
     "windows-foreground-love": "0.5.0"
   }
 }
+
+

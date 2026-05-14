@@ -72,89 +72,95 @@ export const defaultProviderSettings = {
 
 
 export const defaultModelsOfProvider = {
-	openAI: [ // https://platform.openai.com/docs/models/gp
+	openAI: [ // updated 2025/2026
+		'gpt-5',
+		'gpt-5.5',
+		'gpt-5-mini',
 		'gpt-4.1',
 		'gpt-4.1-mini',
 		'gpt-4.1-nano',
 		'o3',
 		'o4-mini',
-		// 'o1',
-		// 'o1-mini',
-		// 'gpt-4o',
-		// 'gpt-4o-mini',
 	],
-	anthropic: [ // https://docs.anthropic.com/en/docs/about-claude/models
-		'claude-opus-4-0',
-		'claude-sonnet-4-0',
+	anthropic: [ // updated 2025/2026
+		'claude-opus-4-7-latest',
+		'claude-opus-4-6-latest',
+		'claude-opus-4-5-latest',
+		'claude-sonnet-4-6-latest',
+		'claude-sonnet-4-5-latest',
+		'claude-haiku-4-latest',
 		'claude-3-7-sonnet-latest',
 		'claude-3-5-sonnet-latest',
 		'claude-3-5-haiku-latest',
-		'claude-3-opus-latest',
 	],
-	xAI: [ // https://docs.x.ai/docs/models?cluster=us-east-1
-		'grok-2',
+	xAI: [ // updated 2025/2026
+		'grok-4',
+		'grok-4-fast',
 		'grok-3',
 		'grok-3-mini',
 		'grok-3-fast',
-		'grok-3-mini-fast'
+		'grok-3-mini-fast',
 	],
-	gemini: [ // https://ai.google.dev/gemini-api/docs/models/gemini
-		'gemini-2.5-pro-exp-03-25',
-		'gemini-2.5-flash-preview-04-17',
+	gemini: [ // updated 2025/2026
+		'gemini-2.5-pro',
+		'gemini-2.5-flash',
+		'gemini-2.5-flash-lite',
 		'gemini-2.0-flash',
 		'gemini-2.0-flash-lite',
-		'gemini-2.5-pro-preview-05-06',
 	],
-	deepseek: [ // https://api-docs.deepseek.com/quick_start/pricing
+	deepseek: [ // updated 2025/2026
+		'deepseek-v4-pro',
+		'deepseek-v4-flash',
 		'deepseek-chat',
 		'deepseek-reasoner',
 	],
-	ollama: [ // autodetected
-	],
-	vLLM: [ // autodetected
-	],
-	lmStudio: [], // autodetected
-
-	openRouter: [ // https://openrouter.ai/models
-		// 'anthropic/claude-3.7-sonnet:thinking',
-		'anthropic/claude-opus-4',
-		'anthropic/claude-sonnet-4',
-		'qwen/qwen3-235b-a22b',
-		'anthropic/claude-3.7-sonnet',
-		'anthropic/claude-3.5-sonnet',
+	ollama: [],
+	vLLM: [],
+	lmStudio: [],
+	openRouter: [ // updated 2025/2026
+		'anthropic/claude-opus-4-7',
+		'anthropic/claude-opus-4-5',
+		'anthropic/claude-sonnet-4-5',
+		'anthropic/claude-haiku-4',
+		'openai/gpt-5',
+		'openai/gpt-5.5',
+		'openai/o3',
+		'google/gemini-2.5-pro',
+		'google/gemini-2.5-flash',
+		'deepseek/deepseek-v4-pro',
 		'deepseek/deepseek-r1',
 		'deepseek/deepseek-r1-zero:free',
-		'mistralai/devstral-small:free'
-		// 'openrouter/quasar-alpha',
-		// 'google/gemini-2.5-pro-preview-03-25',
-		// 'mistralai/codestral-2501',
-		// 'qwen/qwen-2.5-coder-32b-instruct',
-		// 'mistralai/mistral-small-3.1-24b-instruct:free',
-		// 'google/gemini-2.0-flash-lite-preview-02-05:free',
-		// 'google/gemini-2.0-pro-exp-02-05:free',
-		// 'google/gemini-2.0-flash-exp:free',
+		'qwen/qwen3-235b-a22b',
+		'meta-llama/llama-4-maverick',
+		'meta-llama/llama-4-scout',
+		'mistralai/devstral-2',
+		'mistralai/devstral-small-2507:free',
+		'mistralai/codestral-2501',
+		'x-ai/grok-4',
 	],
-	groq: [ // https://console.groq.com/docs/models
-		'qwen-qwq-32b',
+	groq: [ // updated 2025/2026
+		'meta-llama/llama-4-maverick-17b-128e-instruct',
+		'meta-llama/llama-4-scout-17b-16e-instruct',
 		'llama-3.3-70b-versatile',
 		'llama-3.1-8b-instant',
-		// 'qwen-2.5-coder-32b', // preview mode (experimental)
+		'qwen-qwq-32b',
+		'deepseek-r1-distill-llama-70b',
 	],
-	mistral: [ // https://docs.mistral.ai/getting-started/models/models_overview/
+	mistral: [ // updated 2025/2026
 		'codestral-latest',
-		'devstral-small-latest',
-		'mistral-large-latest',
-		'mistral-medium-latest',
-		'ministral-3b-latest',
+		'devstral-2-latest',
+		'devstral-small-2507',
+		'mistral-large-3-latest',
+		'mistral-medium-3-latest',
+		'mistral-small-3-latest',
 		'ministral-8b-latest',
+		'ministral-3b-latest',
 	],
-	openAICompatible: [], // fallback
+	openAICompatible: [],
 	googleVertex: [],
 	microsoftAzure: [],
 	awsBedrock: [],
 	liteLLM: [],
-
-
 } as const satisfies Record<ProviderName, string[]>
 
 

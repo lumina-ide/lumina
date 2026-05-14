@@ -1,305 +1,334 @@
-# Lumina — Inferência Local com llama.cpp
+# Lumina — Implementação de Inferência Local (llama.cpp)
 
-Guia de desenvolvimento para integrar o `llama-server` (llama.cpp) diretamente no Lumina, eliminando a dependência do Ollama como processo externo.
-
----
-
-## Objetivo
-
-Permitir que o usuário use modelos GGUF locais (Neuronal, Helixa, Yune, Huda, Lumina e qualquer outro) diretamente no editor, sem instalar nada além do próprio Lumina.
-
-**Plataformas:** Windows x64, Linux x64
-**Formatos suportados:** GGUF
-**API:** OpenAI-compatible (já suportada pelo pipeline existente)
+Guia de implementação passo a passo para integrar o `llama-server` diretamente no Lumina.
+Objetivo: rodar modelos GGUF locais sem instalar nada além do próprio Lumina.
 
 ---
 
-## Arquitetura
+## Visão Geral
 
 ```
 Lumina Editor
 ├── Browser Process (UI)
-│   ├── Settings UI — seleção de modelo, configuração de parâmetros
-│   └── Provider "llamaServer" — igual aos outros providers
+│   ├── Provider "llamaServer" nas Settings
+│   └── UI de seleção/configuração de modelo
 │
-└── Electron Main Process (Node.js)
+└── Electron Main Process
     ├── LlamaServerService — gerencia o processo llama-server
-    │   ├── spawn/kill do binário
-    │   ├── detecção de GPU (CUDA/Vulkan/CPU)
-    │   └── health check via HTTP
     └── LLMMessageChannel — já existente, sem mudanças
 ```
 
-O `llama-server` expõe `http://localhost:PORT/v1` — API 100% compatível com OpenAI. O pipeline de mensagens existente (`_sendOpenAICompatibleChat`) funciona sem modificação.
+O `llama-server` expõe `http://localhost:PORT/v1` — API OpenAI-compatible.
+O pipeline de mensagens existente (`_sendOpenAICompatibleChat`) funciona **sem modificação**.
 
 ---
 
-## Fase 1 — Provider e processo básico
+## Fase 1 — Provider e Processo Básico
 
-**Estimativa: 4-6 horas**
+**Arquivos a modificar/criar:**
 
-### 1.1 Registrar o provider `llamaServer`
+### 1.1 — Registrar o provider `llamaServer`
 
 **Arquivo:** `src/vs/workbench/contrib/void/common/modelCapabilities.ts`
 
+Adicionar em `defaultProviderSettings`:
 ```typescript
 llamaServer: {
-  endpoint: 'http://127.0.0.1:8080',
-  modelPath: '',        // caminho para o arquivo .gguf
-  contextSize: 4096,
-  gpuLayers: -1,        // -1 = auto (tudo na GPU se possível)
-  threads: 4,
-  temperature: 0.7,
-  repeatPenalty: 1.1,
-  systemPrompt: '',
-}
+    endpoint: 'http://127.0.0.1:8080',
+    modelPath: '',
+    contextSize: 4096,
+    gpuLayers: -1,       // -1 = auto (tudo na GPU)
+    threads: 4,
+    temperature: 0.7,
+    repeatPenalty: 1.1,
+    systemPrompt: '',
+    port: 8080,
+},
 ```
 
-**Arquivo:** `src/vs/workbench/contrib/void/common/voidSettingsTypes.ts`
-- Adicionar `llamaServer` ao `defaultProviderSettings`
-- Adicionar `llamaServer` ao `localProviderNames`
+Adicionar em `defaultModelsOfProvider`:
+```typescript
+llamaServer: [], // autodetected from loaded model
+```
 
-### 1.2 Implementação do provider
+---
+
+### 1.2 — Registrar o tipo do provider
+
+**Arquivo:** `src/vs/workbench/contrib/void/common/voidSettingsTypes.ts`
+
+- Adicionar `llamaServer` ao `localProviderNames`
+- O `ProviderName` é derivado automaticamente de `defaultProviderSettings`
+
+---
+
+### 1.3 — Implementação do provider no pipeline LLM
 
 **Arquivo:** `src/vs/workbench/contrib/void/electron-main/llmMessage/sendLLMMessage.impl.ts`
 
+Adicionar no `newOpenAICompatibleSDK`:
 ```typescript
-llamaServer: {
-  sendChat: (params) => _sendOpenAICompatibleChat(params),  // reutiliza existente
-  sendFIM: (params) => _sendOpenAICompatibleFIM(params),    // reutiliza existente
-  list: llamaServerList,                                     // novo: lista modelos carregados
+else if (providerName === 'llamaServer') {
+    const thisConfig = settingsOfProvider.llamaServer
+    return new OpenAI({
+        baseURL: `${thisConfig.endpoint}/v1`,
+        apiKey: 'noop',
+        ...commonPayloadOpts
+    })
 }
 ```
 
-### 1.3 Serviço de gerenciamento do processo
+Adicionar em `sendLLMMessageToProviderImplementation`:
+```typescript
+llamaServer: {
+    sendChat: (params) => _sendOpenAICompatibleChat(params),
+    sendFIM: (params) => _sendOpenAICompatibleFIM(params),
+    list: llamaServerList,
+},
+```
+
+Implementar `llamaServerList` (lista o modelo carregado via `/v1/models`).
+
+---
+
+### 1.4 — Serviço de gerenciamento do processo
 
 **Arquivo novo:** `src/vs/workbench/contrib/void/electron-main/llamaServerService.ts`
 
-Responsabilidades:
-- Localizar o binário `llama-server` empacotado
-- Detectar GPU disponível (NVIDIA CUDA, AMD Vulkan, CPU fallback)
-- Spawnar o processo com os parâmetros corretos
-- Monitorar saúde via `GET /health`
-- Matar o processo ao fechar o editor
-- Expor eventos: `onStarted`, `onStopped`, `onError`
-
 ```typescript
-export class LlamaServerService extends Disposable {
-  async start(modelPath: string, options: LlamaServerOptions): Promise<void>
-  async stop(): Promise<void>
-  async isRunning(): Promise<boolean>
-  async getLoadedModel(): Promise<string | null>
+export interface ILlamaServerService {
+    readonly _serviceBrand: undefined;
+    start(modelPath: string, options: LlamaServerOptions): Promise<void>;
+    stop(): Promise<void>;
+    isRunning(): Promise<boolean>;
+    getStatus(): LlamaServerStatus;
+    readonly onDidChangeStatus: Event<LlamaServerStatus>;
+}
+
+export type LlamaServerStatus = 'stopped' | 'starting' | 'running' | 'error';
+
+export interface LlamaServerOptions {
+    port: number;
+    contextSize: number;
+    gpuLayers: number;
+    threads: number;
 }
 ```
 
-### 1.4 Registrar o serviço no app.ts
-
-**Arquivo:** `src/vs/code/electron-main/app.ts`
-- Registrar `ILlamaServerService` no container de DI
-- Registrar canal IPC `lumina-channel-llamaServer`
-- Garantir shutdown no `onWillShutdown`
+Responsabilidades:
+- Localizar o binário `llama-server` em `resources/llama/{platform}/`
+- Detectar GPU (NVIDIA CUDA, AMD Vulkan, CPU fallback)
+- Spawnar o processo com `child_process.spawn`
+- Monitorar saúde via `GET /health`
+- Matar o processo no shutdown do editor
+- Emitir eventos de status
 
 ---
 
-## Fase 2 — Gerenciamento de modelos (UI)
+### 1.5 — Registrar o serviço no app.ts
 
-**Estimativa: 4-5 horas**
+**Arquivo:** `src/vs/code/electron-main/app.ts`
 
-### 2.1 Componente de seleção de modelo
+```typescript
+// Lumina - llama.cpp local inference
+services.set(ILlamaServerService, new SyncDescriptor(LlamaServerService, undefined, false));
+
+// Canal IPC
+const llamaServerChannel = ProxyChannel.fromService(accessor.get(ILlamaServerService), disposables);
+mainProcessElectronServer.registerChannel('lumina-channel-llamaServer', llamaServerChannel);
+```
+
+---
+
+## Fase 2 — UI de Configuração
 
 **Arquivo:** `src/vs/workbench/contrib/void/browser/react/src/void-settings-tsx/Settings.tsx`
 
-Adicionar seção "Local Models (llama.cpp)" com:
-- Botão "Browse" para selecionar arquivo `.gguf`
-- Campo de caminho do modelo
-- Status do servidor (Stopped / Loading / Running)
-- Botão Start/Stop manual
-- Indicador de GPU detectada
+Adicionar seção "Local Model (llama.cpp)" com:
 
-### 2.2 Parâmetros configuráveis pelo usuário
-
-Expor na UI:
-| Parâmetro | Padrão | Descrição |
-|---|---|---|
-| Context Size | 4096 | Janela de contexto |
-| GPU Layers | -1 (auto) | Camadas na GPU (-1 = todas) |
-| Threads | 4 | Threads de CPU |
-| Temperature | 0.7 | Criatividade do modelo |
-| Repeat Penalty | 1.1 | Penalidade de repetição |
-| System Prompt | (vazio) | Prompt de sistema fixo |
-| Port | 8080 | Porta do servidor |
-
-### 2.3 Modelos recomendados (Neuronal)
-
-Lista de modelos da família Neuronal pré-configurados com capabilities corretas:
-
-```typescript
-const neuronalModelOptions = {
-  'neuronal-1b': { contextWindow: 4096, sizeGb: 0.8, supportsFIM: true },
-  'neuronal-2b': { contextWindow: 4096, sizeGb: 1.5, supportsFIM: true },
-  'neuronal-4b': { contextWindow: 8192, sizeGb: 2.8, supportsFIM: true },
-  'neuronal-7b': { contextWindow: 8192, sizeGb: 4.5, supportsFIM: true },
-  'helixa-4b':   { contextWindow: 8192, sizeGb: 2.8, supportsFIM: false },
-  'yune-7b':     { contextWindow: 16384, sizeGb: 4.5, supportsFIM: false },
-  'huda-4b':     { contextWindow: 8192, sizeGb: 2.8, supportsFIM: false },
-  'lumina-7b':   { contextWindow: 16384, sizeGb: 4.5, supportsFIM: true },
-}
+```
+┌─────────────────────────────────────────┐
+│  Local Model (llama.cpp)                │
+│                                         │
+│  Model file: [Browse...]  path/to/model │
+│  Status: ● Running — qwen2.5-coder-7b  │
+│                                         │
+│  GPU: NVIDIA RTX 3080 (CUDA)           │
+│  Context: [4096    ▼]                  │
+│  GPU Layers: [-1 (auto) ▼]             │
+│  Threads: [4  ▼]                       │
+│  Temperature: [0.7]                    │
+│  Repeat Penalty: [1.1]                 │
+│  Port: [8080]                          │
+│                                         │
+│  System Prompt:                         │
+│  [                                    ] │
+│                                         │
+│  [  Start Model  ]  [  Stop  ]         │
+└─────────────────────────────────────────┘
 ```
 
 ---
 
-## Fase 3 — Binários empacotados
+## Fase 3 — Binários llama-server
 
-**Estimativa: 3-4 horas**
-
-### 3.1 Estrutura de binários
+### 3.1 — Estrutura de pastas
 
 ```
 resources/
 └── llama/
     ├── win32-x64/
-    │   ├── llama-server.exe
-    │   ├── llama-server-cuda.exe    # versão NVIDIA
-    │   └── llama-server-vulkan.exe  # versão AMD/Intel
+    │   ├── llama-server.exe          # CPU only
+    │   ├── llama-server-cuda.exe     # NVIDIA CUDA
+    │   └── llama-server-vulkan.exe   # AMD/Intel Vulkan
     └── linux-x64/
-        ├── llama-server
-        ├── llama-server-cuda
-        └── llama-server-vulkan
+        ├── llama-server              # CPU only
+        ├── llama-server-cuda         # NVIDIA CUDA
+        └── llama-server-vulkan       # AMD/Intel Vulkan
 ```
 
-### 3.2 Detecção de GPU
+### 3.2 — Obter os binários
+
+Baixar releases do llama.cpp: https://github.com/ggml-org/llama.cpp/releases
+
+Para Windows:
+- `llama-bXXXX-bin-win-cpu-x64.zip` → extrair `llama-server.exe`
+- `llama-bXXXX-bin-win-cuda-cu12.4-x64.zip` → extrair `llama-server.exe` → renomear para `llama-server-cuda.exe`
+- `llama-bXXXX-bin-win-vulkan-x64.zip` → extrair `llama-server.exe` → renomear para `llama-server-vulkan.exe`
+
+Para Linux:
+- Mesma lógica com os zips linux
+
+### 3.3 — Detecção de GPU
 
 ```typescript
 async function detectGPU(): Promise<'cuda' | 'vulkan' | 'cpu'> {
-  // Windows: checar registro NVIDIA, AMD
-  // Linux: checar /dev/nvidia*, lspci
-  // Fallback: CPU
+    if (process.platform === 'win32') {
+        // Checar registro NVIDIA: HKLM\SOFTWARE\NVIDIA Corporation
+        // Checar registro AMD: HKLM\SOFTWARE\AMD
+    } else {
+        // Linux: checar /dev/nvidia0 ou lspci
+    }
+    return 'cpu'; // fallback
 }
 ```
 
-### 3.3 Seleção automática do binário
+### 3.4 — Incluir no build
 
-```typescript
-const binaryName = platform === 'win32'
-  ? `llama-server${gpu === 'cuda' ? '-cuda' : gpu === 'vulkan' ? '-vulkan' : ''}.exe`
-  : `llama-server${gpu === 'cuda' ? '-cuda' : gpu === 'vulkan' ? '-vulkan' : ''}`
-```
+**Arquivo:** `build/gulpfile.vscode.js`
 
-### 3.4 Atualizar o build
-
-**Arquivo:** `build/gulpfile.vscode.js` ou `build/gulpfile.vscode.win32.js`
-- Incluir pasta `resources/llama/` no pacote final
-- Garantir permissões de execução no Linux (`chmod +x`)
+Adicionar cópia da pasta `resources/llama/` no pacote final.
 
 ---
 
-## Fase 4 — RAG e multimodal
+## Fase 4 — RAG (Retrieval-Augmented Generation)
 
-**Estimativa: 6-8 horas**
+### 4.1 — Componentes necessários
 
-### 4.1 RAG (Retrieval-Augmented Generation)
+- **Indexador**: usa o file watcher existente do VSCode para monitorar mudanças
+- **Embeddings**: via `llama-server` endpoint `/v1/embeddings`
+- **Vector store**: SQLite (já existe `@vscode/sqlite3` nas deps)
+- **Injeção de contexto**: adiciona chunks relevantes no system prompt
 
-Permite que o modelo acesse documentação atualizada, código do projeto, etc.
+### 4.2 — Fluxo
 
-**Componentes:**
-- Indexador de arquivos do workspace (usa o file watcher existente do VSCode)
-- Embeddings locais via `llama-server` (endpoint `/v1/embeddings`)
-- Vector store simples em SQLite (já existe `@vscode/sqlite3` nas deps)
-- Injeção automática de contexto relevante no prompt
-
-**Fluxo:**
 ```
 Usuário faz pergunta
-→ Gera embedding da pergunta
-→ Busca chunks similares no vector store
-→ Injeta no system prompt
-→ Envia para o modelo
+  → Gera embedding da pergunta (llama-server /v1/embeddings)
+  → Busca chunks similares no SQLite (cosine similarity)
+  → Injeta no system prompt como contexto
+  → Envia para o modelo
 ```
 
-### 4.2 Suporte multimodal (imagem)
+### 4.3 — Arquivos novos
 
-Para modelos com capacidade visual (LLaVA, BakLLaVA, modelos Neuronal multimodais):
+- `src/.../void/electron-main/ragService.ts` — indexação e busca
+- `src/.../void/common/ragServiceTypes.ts` — tipos e interface
+- `src/.../void/electron-main/ragChannel.ts` — canal IPC
 
-- Detectar se o modelo carregado suporta visão (via `/v1/models` metadata)
-- Habilitar upload de imagem no chat (já existe infraestrutura no Lumina)
-- Converter imagem para base64 e incluir no payload OpenAI vision format
+---
+
+## Fase 5 — Suporte Multimodal
+
+Para modelos com visão (LLaVA, modelos Neuronal multimodais):
+
+### 5.1 — Detecção de capacidade
 
 ```typescript
-// Payload para modelos multimodais
+// GET /v1/models retorna metadata do modelo
+// Checar se o modelo tem "vision" nas capabilities
+const hasVision = modelInfo.capabilities?.includes('vision') ?? false;
+```
+
+### 5.2 — Payload de imagem
+
+```typescript
+// Formato OpenAI vision (suportado pelo llama-server)
 {
-  role: 'user',
-  content: [
-    { type: 'text', text: 'O que há nessa imagem?' },
-    { type: 'image_url', image_url: { url: 'data:image/png;base64,...' } }
-  ]
+    role: 'user',
+    content: [
+        { type: 'text', text: 'O que há nessa imagem?' },
+        { type: 'image_url', image_url: { url: 'data:image/png;base64,...' } }
+    ]
 }
 ```
 
----
+### 5.3 — UI
 
-## Fase 5 — Polimento e UX
-
-**Estimativa: 3-4 horas**
-
-### 5.1 Onboarding para modelos locais
-
-Na tela de onboarding existente, adicionar passo:
-- "Você tem modelos GGUF locais? Aponte o caminho."
-- Detectar automaticamente se há modelos em pastas comuns
-- Sugerir download de modelos recomendados da Neuronal
-
-### 5.2 Indicadores de status
-
-- Ícone na status bar mostrando: modelo carregado, uso de VRAM, velocidade (tokens/s)
-- Notificação quando o modelo terminar de carregar
-- Aviso quando VRAM insuficiente (sugerir reduzir GPU layers)
-
-### 5.3 Checklist de manutenção mensal
-
-Ver `MAINTENANCE.md` para procedimentos de atualização do llama.cpp.
+- Habilitar botão de upload de imagem no chat quando modelo suportar visão
+- Converter imagem para base64 no browser process
+- Enviar via payload multimodal
 
 ---
 
-## Ordem de implementação recomendada
+## Ordem de Implementação
 
 ```
-Fase 1.1 → 1.2 → 1.3 → 1.4   (provider + processo)
-     ↓
-Fase 2.1 → 2.2 → 2.3          (UI básica)
-     ↓
-Fase 3.1 → 3.2 → 3.3 → 3.4   (binários)
-     ↓
-Testar end-to-end
-     ↓
-Fase 4.1 (RAG)
-Fase 4.2 (multimodal)
-     ↓
-Fase 5 (polimento)
+Fase 1.1  Registrar provider llamaServer em modelCapabilities.ts
+Fase 1.2  Registrar tipo em voidSettingsTypes.ts
+Fase 1.3  Implementar no pipeline LLM (sendLLMMessage.impl.ts)
+Fase 1.4  Criar LlamaServerService (electron-main)
+Fase 1.5  Registrar no app.ts
+    ↓
+Testar: subir llama-server manualmente, verificar chat funcionando
+    ↓
+Fase 2    UI de configuração nas Settings
+    ↓
+Fase 3.1  Criar estrutura resources/llama/
+Fase 3.2  Baixar binários llama.cpp
+Fase 3.3  Implementar detecção de GPU
+Fase 3.4  Incluir no build
+    ↓
+Testar: build completo, instalador, rodar modelo do zero
+    ↓
+Fase 4    RAG
+Fase 5    Multimodal
 ```
 
 ---
 
-## Arquivos que serão criados/modificados
+## Arquivos Modificados/Criados
 
 | Arquivo | Ação |
 |---|---|
-| `src/.../common/modelCapabilities.ts` | Adicionar `llamaServer` provider |
-| `src/.../common/voidSettingsTypes.ts` | Registrar provider e settings |
-| `src/.../electron-main/llamaServerService.ts` | **NOVO** — gerenciador de processo |
-| `src/.../electron-main/sendLLMMessage.impl.ts` | Adicionar `llamaServer` implementation |
-| `src/.../electron-main/sendLLMMessageChannel.ts` | Adicionar canal `llamaServer` |
-| `src/.../code/electron-main/app.ts` | Registrar serviço e canal |
+| `src/.../common/modelCapabilities.ts` | Adicionar `llamaServer` |
+| `src/.../common/voidSettingsTypes.ts` | Adicionar ao `localProviderNames` |
+| `src/.../electron-main/llamaServerService.ts` | **NOVO** |
+| `src/.../electron-main/sendLLMMessage.impl.ts` | Adicionar `llamaServer` |
+| `src/.../electron-main/sendLLMMessageChannel.ts` | Adicionar canal |
+| `src/.../code/electron-main/app.ts` | Registrar serviço |
 | `src/.../react/src/void-settings-tsx/Settings.tsx` | UI de configuração |
-| `resources/llama/` | **NOVO** — binários llama-server |
-| `build/gulpfile.vscode.js` | Incluir binários no pacote |
-| `BUILDING.md` | Documentar como obter binários llama.cpp |
+| `resources/llama/` | **NOVO** — binários |
+| `build/gulpfile.vscode.js` | Incluir `resources/llama/` no pacote |
+| `scripts/build-installer-win32-x64.bat` | Já atualizado |
 
 ---
 
-## Notas importantes
+## Notas Importantes
 
-- O `llama-server` usa a mesma API OpenAI — **zero mudanças no pipeline de mensagens**
+- O `llama-server` usa API OpenAI-compatible — **zero mudanças no pipeline de mensagens**
 - Manter Ollama como provider opcional para quem já usa
-- O processo `llama-server` deve ser filho do processo Electron main — morre junto com o editor
-- Modelos grandes (13B+) requerem GPU com VRAM suficiente — documentar requisitos mínimos
+- O processo `llama-server` deve morrer junto com o editor (filho do main process)
+- Modelos recomendados para começar: `qwen2.5-coder-7b-instruct.Q4_K_M.gguf` (~4.5GB)
 - Para CPU-only: modelos até 7B são viáveis com 16GB RAM
+- Para GPU 8GB VRAM: até 13B confortável

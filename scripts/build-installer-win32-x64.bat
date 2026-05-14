@@ -5,7 +5,15 @@ echo  Lumina - Build Installer Win32 x64
 echo ========================================
 echo.
 
-echo [1/3] Building Lumina win32-x64...
+echo [0/4] Bumping version...
+node scripts/bump-version.js
+if %errorlevel% neq 0 (
+    echo ERROR: Version bump failed.
+    exit /b %errorlevel%
+)
+
+echo.
+echo [1/4] Building Lumina win32-x64...
 call npm run gulp vscode-win32-x64
 if %errorlevel% neq 0 (
     echo ERROR: Build failed.
@@ -13,7 +21,7 @@ if %errorlevel% neq 0 (
 )
 
 echo.
-echo [2/3] Copying inno_updater tools...
+echo [2/4] Copying inno_updater tools...
 call npm run gulp vscode-win32-x64-inno-updater
 if %errorlevel% neq 0 (
     echo ERROR: inno-updater failed.
@@ -21,7 +29,7 @@ if %errorlevel% neq 0 (
 )
 
 echo.
-echo [3/3] Building installer...
+echo [3/4] Building installer...
 call npm run gulp vscode-win32-x64-user-setup
 if %errorlevel% neq 0 (
     echo ERROR: Installer build failed.
