@@ -1,8 +1,8 @@
 {
 	"nameShort": "Lumina",
 	"nameLong": "Lumina",
-	"luminaVersion": "0.1.0",
-	"luminaRelease": "0001",
+	"luminaVersion": "0.1.2",
+	"luminaRelease": "0003",
 	"applicationName": "lumina",
 	"dataFolderName": ".lumina-editor",
 	"win32MutexName": "luminaeditor",

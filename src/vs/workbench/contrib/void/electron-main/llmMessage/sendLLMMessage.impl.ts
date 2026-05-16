@@ -369,13 +369,13 @@ const _sendOpenAICompatibleChat = async ({ messages, onText, onFinalMessage, onE
 				})
 
 			}
-			// on final
-			if (!fullTextSoFar && !fullReasoningSoFar && !toolName) {
-				onError({ message: 'Lumina: Response from model was empty.', fullError: null })
-				const toolCall = rawToolCallObjOfParamsStr(toolName, toolParamsStr, toolId)
-				const toolCallObj = toolCall ? { toolCall } : {}
-				onFinalMessage({ fullText: fullTextSoFar, fullReasoning: fullReasoningSoFar, anthropicReasoning: null, ...toolCallObj });
-			}
+                        // on final
+                        if (!fullTextSoFar && !fullReasoningSoFar && !toolName) {
+                                onError({ message: 'Lumina: Response from model was empty.', fullError: null })
+                        }
+                        const toolCall = rawToolCallObjOfParamsStr(toolName, toolParamsStr, toolId)
+                        const toolCallObj = toolCall ? { toolCall } : {}
+                        onFinalMessage({ fullText: fullTextSoFar, fullReasoning: fullReasoningSoFar, anthropicReasoning: null, ...toolCallObj });
 		})
 		// when error/fail - this catches errors of both .create() and .then(for await)
 		.catch(error => {

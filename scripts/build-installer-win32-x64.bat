@@ -6,7 +6,7 @@ echo ========================================
 echo.
 
 echo [0/4] Bumping version...
-node scripts/bump-version.js
+node scripts/bump-version.cjs
 if %errorlevel% neq 0 (
     echo ERROR: Version bump failed.
     exit /b %errorlevel%
