@@ -9,7 +9,7 @@
 	/>
 </div>
 
-Lumina is an open-source AI-powered code editor by [Neuronal](https://neuronal.ai).
+Lumina is an open-source AI-powered code editor by [Neuronal](https://neuronal.ia.br).
 
 Use AI agents on your codebase, checkpoint and visualize changes, and bring any model or host locally. Lumina sends messages directly to providers without retaining your data.
 
