@@ -4,6 +4,13 @@ All notable changes to Lumina are documented here.
 
 ---
 
+## [Unreleased]
+
+### Fixed — Security
+- **Approval buttons invisible when agent paused** — Fixed `isCheckpointGhost` logic that was applying `opacity-50 pointer-events-none` to approval buttons when the agent was waiting for user approval (LLM paused streaming). Tool request messages now always remain clickable regardless of checkpoint state. The ghost effect now only affects the tool result display, never the approval controls.
+
+---
+
 ## [0.1.1] — 2025-05-11
 
 ### Fixed

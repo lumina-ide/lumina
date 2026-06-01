@@ -2553,10 +2553,10 @@ const _ChatBubble = ({ threadId, chatMessage, currCheckpointIdx, isCommitted, me
 						threadId={threadId}
 					/>
 				</div>
-				{chatMessage.type === 'tool_request' ?
-					<div className={`${isCheckpointGhost ? 'opacity-50 pointer-events-none' : ''}`}>
-						<ToolRequestAcceptRejectButtons toolName={chatMessage.name} />
-					</div> : null}
+                                {chatMessage.type === 'tool_request' ?
+                                        <div>
+                                                <ToolRequestAcceptRejectButtons toolName={chatMessage.name} />
+                                        </div> : null}
 			</>
 		return null
 	}
