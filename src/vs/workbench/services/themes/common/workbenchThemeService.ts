@@ -39,7 +39,7 @@ export enum ThemeSettings {
 }
 
 export enum ThemeSettingDefaults {
-	COLOR_THEME_DARK = 'Lumina Dark', // Lumina changed this - Lumina brand theme
+	COLOR_THEME_DARK = 'Lumina Yellow', // Lumina changed this - Lumina brand theme (Mayukai inspired)
 	COLOR_THEME_LIGHT = 'Default Light Modern',
 	COLOR_THEME_HC_DARK = 'Default High Contrast',
 	COLOR_THEME_HC_LIGHT = 'Default High Contrast Light',

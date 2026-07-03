@@ -19,6 +19,7 @@ import { IFileService } from '../../../../../../../platform/files/common/files.j
 import { IHoverService } from '../../../../../../../platform/hover/browser/hover.js';
 import { IThemeService } from '../../../../../../../platform/theme/common/themeService.js';
 import { ILLMMessageService } from '../../../../common/sendLLMMessageService.js';
+import { ILlamaServerService } from '../../../../common/llamaServerService.js';
 import { IRefreshModelService } from '../../../../../../../workbench/contrib/void/common/refreshModelService.js';
 import { IVoidSettingsService } from '../../../../../../../workbench/contrib/void/common/voidSettingsService.js';
 import { IExtensionTransferService } from '../../../../../../../workbench/contrib/void/browser/extensionTransferService.js'
@@ -196,6 +197,7 @@ const getReactAccessor = (accessor: ServicesAccessor) => {
 		IVoidSettingsService: accessor.get(IVoidSettingsService),
 		IEditCodeService: accessor.get(IEditCodeService),
 		IChatThreadService: accessor.get(IChatThreadService),
+		ILlamaServerService: accessor.get(ILlamaServerService),
 
 		IInstantiationService: accessor.get(IInstantiationService),
 		ICodeEditorService: accessor.get(ICodeEditorService),

@@ -65,6 +65,17 @@ export const defaultProviderSettings = {
 		region: 'us-east-1', // add region setting
 		endpoint: '', // optionally allow overriding default
 	},
+	llamaServer: {
+		modelPath: '',
+		gpuLayers: '-1',
+		threads: '4',
+		contextSize: '4096',
+		port: '8080',
+		endpoint: 'http://127.0.0.1:8080',
+		temperature: '0.1',
+		maxTokens: '2048',
+		systemPrompt: '',
+	},
 
 } as const
 
@@ -161,6 +172,7 @@ export const defaultModelsOfProvider = {
 	microsoftAzure: [],
 	awsBedrock: [],
 	liteLLM: [],
+	llamaServer: [],
 } as const satisfies Record<ProviderName, string[]>
 
 
@@ -433,6 +445,7 @@ const extensiveModelOptionsFallback: VoidStaticProviderInfo['modelOptionsFallbac
 	if (lower.includes('deepseek')) return toFallback(openSourceModelOptions_assumingOAICompat, 'deepseekCoderV3')
 
 	if (lower.includes('llama3')) return toFallback(openSourceModelOptions_assumingOAICompat, 'llama3')
+	if (lower.includes('helixa')) return toFallback(openSourceModelOptions_assumingOAICompat, 'llama3')
 	if (lower.includes('llama3.1')) return toFallback(openSourceModelOptions_assumingOAICompat, 'llama3.1')
 	if (lower.includes('llama3.2')) return toFallback(openSourceModelOptions_assumingOAICompat, 'llama3.2')
 	if (lower.includes('llama3.3')) return toFallback(openSourceModelOptions_assumingOAICompat, 'llama3.3')
@@ -1480,6 +1493,7 @@ const modelSettingsOfProvider: { [providerName in ProviderName]: VoidStaticProvi
 	googleVertex: googleVertexSettings,
 	microsoftAzure: microsoftAzureSettings,
 	awsBedrock: awsBedrockSettings,
+	llamaServer: openaiCompatible,
 } as const
 
 

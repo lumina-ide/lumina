@@ -9,6 +9,18 @@ All notable changes to Lumina are documented here.
 ### Fixed — Security
 - **Approval buttons invisible when agent paused** — Fixed `isCheckpointGhost` logic that was applying `opacity-50 pointer-events-none` to approval buttons when the agent was waiting for user approval (LLM paused streaming). Tool request messages now always remain clickable regardless of checkpoint state. The ghost effect now only affects the tool result display, never the approval controls.
 
+### Added — Visual Branding
+- **Lumina Yellow theme (default)** — New default color theme inspired by Mayukai Mirage Gruvbox Darktooth with warm yellow (#fabd2f) and orange (#fe8019) accents. Features a dark background (#282828) with excellent readability for all-day development work.
+- **New Lumina icon set** — Completely redesigned application icons and installer graphics with new Lumina branding. Includes:
+  - Updated `.ico` files for Windows shortcuts and task bar
+  - New `.bmp` graphics for installer wizard
+  - Refreshed logo assets throughout the application
+
+### Updated
+- **Default color theme** — Lumina Yellow replaces Lumina Dark as the default theme for new installations
+- **Windows installer** — Updated with new Lumina branding icons
+- **Theme colors** — Default background color changed from `#070f1c` (navy) to `#282828` (warm dark) to match Lumina Yellow theme
+
 ---
 
 ## [0.1.1] — 2025-05-11

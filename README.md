@@ -2,14 +2,14 @@
 
 <div align="center">
 	<img
-		src="./resources/win32/logo_cube_noshadow.png"
-		alt="Lumina Welcome"
-		width="300"
-		height="300"
+		src="./resources/lumina-ide-logo.png"
+		alt="Lumina IDE - AI-Powered Code Editor"
+		width="500"
+		height="auto"
 	/>
 </div>
 
-Lumina is an open-source AI-powered code editor by [Neuronal](https://neuronal.ia.br).
+**Lumina** is an open-source, AI-powered code editor by [Neuronal](https://neuronal.ia.br).
 
 Use AI agents on your codebase, checkpoint and visualize changes, and bring any model or host locally. Lumina sends messages directly to providers without retaining your data.
 
@@ -29,4 +29,4 @@ For build instructions, see [BUILDING](./BUILDING.md).
 
 ## Support
 
-Contact us via email: hello@neuronal.ai
+Contact us via email: contato@neuronal.ia.br

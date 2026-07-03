@@ -16,7 +16,7 @@ type UnionOfKeys<T> = T extends T ? keyof T : never;
 export type ProviderName = keyof typeof defaultProviderSettings
 export const providerNames = Object.keys(defaultProviderSettings) as ProviderName[]
 
-export const localProviderNames = ['ollama', 'vLLM', 'lmStudio'] satisfies ProviderName[] // all local names
+export const localProviderNames = ['ollama', 'vLLM', 'lmStudio', 'llamaServer'] satisfies ProviderName[] // all local names
 export const nonlocalProviderNames = providerNames.filter((name) => !(localProviderNames as string[]).includes(name)) // all non-local names
 
 type CustomSettingName = UnionOfKeys<typeof defaultProviderSettings[ProviderName]>
@@ -106,6 +106,9 @@ export const displayInfoOfProviderName = (providerName: ProviderName): DisplayIn
 	else if (providerName === 'awsBedrock') {
 		return { title: 'AWS Bedrock', }
 	}
+	else if (providerName === 'llamaServer') {
+		return { title: 'Local Model (llama.cpp)', }
+	}
 
 	throw new Error(`descOfProviderName: Unknown provider name: "${providerName}"`)
 }
@@ -128,6 +131,7 @@ export const subTextMdOfProviderName = (providerName: ProviderName): string => {
 	if (providerName === 'vLLM') return 'Read more about custom [Endpoints here](https://docs.vllm.ai/en/latest/getting_started/quickstart.html#openai-compatible-server).'
 	if (providerName === 'lmStudio') return 'Read more about custom [Endpoints here](https://lmstudio.ai/docs/app/api/endpoints/openai).'
 	if (providerName === 'liteLLM') return 'Read more about endpoints [here](https://docs.litellm.ai/docs/providers/openai_compatible).'
+	if (providerName === 'llamaServer') return 'Run GGUF models locally on your GPU (CUDA/Vulkan) or CPU using bundled llama.cpp.'
 
 	throw new Error(`subTextMdOfProviderName: Unknown provider name: "${providerName}"`)
 }
@@ -230,6 +234,31 @@ export const displayInfoOfSettingName = (providerName: ProviderName, settingName
 		}
 	}
 
+	else if (settingName === 'modelPath') {
+		return { title: 'Model Path (.gguf)', placeholder: 'E.g. E:\\models\\qwen2.5-coder-7b.gguf' }
+	}
+	else if (settingName === 'gpuLayers') {
+		return { title: 'GPU Layers (-1 = auto, 0 = CPU)', placeholder: '-1' }
+	}
+	else if (settingName === 'threads') {
+		return { title: 'CPU Threads', placeholder: '4' }
+	}
+	else if (settingName === 'contextSize') {
+		return { title: 'Context Size', placeholder: '4096' }
+	}
+	else if (settingName === 'port') {
+		return { title: 'Port', placeholder: '8080' }
+	}
+	else if (settingName === 'temperature') {
+		return { title: 'Temperature', placeholder: '0.1' }
+	}
+	else if (settingName === 'maxTokens') {
+		return { title: 'Max Response Tokens', placeholder: '2048' }
+	}
+	else if (settingName === 'systemPrompt') {
+		return { title: 'Custom System Prompt', placeholder: 'Optional system instructions...' }
+	}
+
 	throw new Error(`displayInfo: Unknown setting name: "${settingName}"`)
 }
 
@@ -241,6 +270,14 @@ const defaultCustomSettings: Record<CustomSettingName, undefined> = {
 	project: undefined,
 	azureApiVersion: undefined,
 	headersJSON: undefined,
+	modelPath: undefined,
+	gpuLayers: undefined,
+	threads: undefined,
+	contextSize: undefined,
+	port: undefined,
+	temperature: undefined,
+	maxTokens: undefined,
+	systemPrompt: undefined,
 }
 
 
@@ -350,6 +387,12 @@ export const defaultSettingsOfProvider: SettingsOfProvider = {
 		...defaultCustomSettings,
 		...defaultProviderSettings.awsBedrock,
 		...modelInfoOfDefaultModelNames(defaultModelsOfProvider.awsBedrock),
+		_didFillInProviderSettings: undefined,
+	},
+	llamaServer: {
+		...defaultCustomSettings,
+		...defaultProviderSettings.llamaServer,
+		...modelInfoOfDefaultModelNames(defaultModelsOfProvider.llamaServer),
 		_didFillInProviderSettings: undefined,
 	},
 }

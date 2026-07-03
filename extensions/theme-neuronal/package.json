@@ -14,6 +14,12 @@
   "contributes": {
     "themes": [
       {
+        "id": "Lumina Yellow",
+        "label": "Lumina Yellow",
+        "uiTheme": "vs-dark",
+        "path": "./themes/lumina_yellow.json"
+      },
+      {
         "id": "Lumina Dark",
         "label": "Lumina Dark",
         "uiTheme": "vs-dark",
