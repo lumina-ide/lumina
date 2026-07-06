@@ -151,7 +151,10 @@ const _validatedModelState = (state: Omit<VoidSettingsState, '_modelOptions'>): 
 	for (const providerName of providerNames) {
 		const settingsAtProvider = newSettingsOfProvider[providerName]
 
-		const didFillInProviderSettings = Object.keys(defaultProviderSettings[providerName]).every(key => !!settingsAtProvider[key as keyof typeof settingsAtProvider])
+		const didFillInProviderSettings = Object.keys(defaultProviderSettings[providerName]).every(key => {
+			if (key === 'systemPrompt') return true;
+			return !!settingsAtProvider[key as keyof typeof settingsAtProvider];
+		})
 
 		if (didFillInProviderSettings === settingsAtProvider._didFillInProviderSettings) continue
 

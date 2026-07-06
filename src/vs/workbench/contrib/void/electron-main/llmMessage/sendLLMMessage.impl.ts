@@ -20,6 +20,7 @@ import { getSendableReasoningInfo, getModelCapabilities, getProviderCapabilities
 import { extractReasoningWrapper, extractXMLToolsWrapper } from './extractGrammar.js';
 import { availableTools, InternalToolInfo } from '../../common/prompt/prompts.js';
 import { generateUuid } from '../../../../../base/common/uuid.js';
+import { activeLlamaServerPort } from '../llamaServerState.js';
 
 const getGoogleApiKey = async () => {
 	// module‑level singleton
@@ -166,6 +167,14 @@ const newOpenAICompatibleSDK = async ({ settingsOfProvider, providerName, includ
 		const thisConfig = settingsOfProvider[providerName]
 		return new OpenAI({ baseURL: 'https://api.mistral.ai/v1', apiKey: thisConfig.apiKey, ...commonPayloadOpts })
 	}
+	else if (providerName === 'llamaServer') {
+		const thisConfig = settingsOfProvider[providerName]
+		let baseURL = thisConfig.endpoint;
+		if (baseURL.includes('127.0.0.1') || baseURL.includes('localhost')) {
+			baseURL = `http://127.0.0.1:${activeLlamaServerPort}`;
+		}
+		return new OpenAI({ baseURL: `${baseURL}/v1`, apiKey: 'noop', ...commonPayloadOpts })
+	}
 
 	else throw new Error(`Void providerName was invalid: ${providerName}.`)
 }
@@ -307,6 +316,43 @@ const _sendOpenAICompatibleChat = async ({ messages, onText, onFinalMessage, onE
 		...nativeToolsObj,
 		...additionalOpenAIPayload
 		// max_completion_tokens: maxTokens,
+	}
+
+	if (providerName === 'llamaServer') {
+		const thisConfig = settingsOfProvider[providerName];
+		
+		const temp = parseFloat(thisConfig.temperature);
+		options.temperature = !isNaN(temp) ? temp : 0.1;
+
+		const maxTok = parseInt(thisConfig.maxTokens);
+		options.max_tokens = !isNaN(maxTok) ? maxTok : 2048;
+
+		options.stop = [
+			'<|im_end|>',
+			'<|end_of_text|>',
+			'<|im_start|>',
+			'User:',
+			'Assistant:',
+			'System:',
+			'User ',
+			'Assistant ',
+			'System '
+		];
+
+		const customSystemPrompt = thisConfig.systemPrompt;
+		if (customSystemPrompt) {
+			const messagesCopy = [...options.messages];
+			const systemMsgIndex = messagesCopy.findIndex(m => m.role === 'system');
+			if (systemMsgIndex !== -1) {
+				messagesCopy[systemMsgIndex] = { 
+					...messagesCopy[systemMsgIndex], 
+					content: messagesCopy[systemMsgIndex].content + "\n\n" + customSystemPrompt 
+				};
+			} else {
+				messagesCopy.unshift({ role: 'system', content: customSystemPrompt });
+			}
+			options.messages = messagesCopy as any;
+		}
 	}
 
 	// open source models - manually parse think tokens
@@ -933,6 +979,11 @@ export const sendLLMMessageToProviderImplementation = {
 		sendChat: (params) => _sendOpenAICompatibleChat(params),
 		sendFIM: null,
 		list: null,
+	},
+	llamaServer: {
+		sendChat: (params) => _sendOpenAICompatibleChat(params),
+		sendFIM: (params) => _sendOpenAICompatibleFIM(params),
+		list: (params) => _openaiCompatibleList(params),
 	},
 
 } satisfies CallFnOfProvider

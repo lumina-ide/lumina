@@ -18,6 +18,7 @@ import { IconLoading } from '../sidebar-tsx/SidebarChat.js'
 import { ToolApprovalType, toolApprovalTypes } from '../../../../common/toolsServiceTypes.js'
 import Severity from '../../../../../../../base/common/severity.js'
 import { getModelCapabilities, modelOverrideKeys, ModelOverrides } from '../../../../common/modelCapabilities.js';
+import { ILlamaServerService, LlamaServerStatus } from '../../../../common/llamaServerService.js';
 import { TransferEditorType, TransferFilesInfo } from '../../../extensionTransferTypes.js';
 import { MCPServer } from '../../../../common/mcpServiceTypes.js';
 import { useMCPServiceState } from '../util/services.js';
@@ -629,15 +630,42 @@ const ProviderSetting = ({ providerName, settingName, subTextMd }: { providerNam
 		voidSettingsService.setSettingOfProvider(providerName, settingName, newVal)
 	}, [voidSettingsService, providerName, settingName]);
 
+	const handleBrowse = useCallback(async () => {
+		const nativeHostService = accessor.get('INativeHostService');
+		const result = await nativeHostService.showOpenDialog({
+			title: 'Select GGUF Model',
+			properties: ['openFile'],
+			filters: [{ name: 'GGUF Models', extensions: ['gguf'] }]
+		});
+		if (result && result.filePaths && result.filePaths.length > 0) {
+			handleChangeValue(result.filePaths[0]);
+		}
+	}, [accessor, handleChangeValue]);
+
 	return <ErrorBoundary>
-		<div className='my-1'>
-			<VoidSimpleInputBox
-				value={settingValue}
-				onChangeValue={handleChangeValue}
-				placeholder={`${settingTitle} (${placeholder})`}
-				passwordBlur={isPasswordField}
-				compact={true}
-			/>
+		<div className='my-2 flex flex-col gap-1'>
+			<div className="text-xs font-semibold text-void-fg-3 px-1">
+				{settingTitle}
+			</div>
+			<div className="flex items-center gap-2">
+				<div className="flex-grow">
+					<VoidSimpleInputBox
+						value={settingValue}
+						onChangeValue={handleChangeValue}
+						placeholder={`${settingTitle} (${placeholder})`}
+						passwordBlur={isPasswordField}
+						compact={true}
+					/>
+				</div>
+				{settingName === 'modelPath' && (
+					<button
+						onClick={handleBrowse}
+						className="px-3 py-1.5 text-xs font-semibold rounded bg-void-bg-1 border border-void-border-1 hover:brightness-110 text-void-fg-1"
+					>
+						Browse...
+					</button>
+				)}
+			</div>
 			{!subTextMd ? null : <div className='py-1 px-3 opacity-50 text-sm'>
 				{subTextMd}
 			</div>}
@@ -691,6 +719,108 @@ const ProviderSetting = ({ providerName, settingName, subTextMd }: { providerNam
 // }
 
 
+export const LlamaServerControls = () => {
+	const accessor = useAccessor();
+	const llamaServerService = accessor.get('ILlamaServerService');
+	const voidSettingsState = useSettingsState();
+
+	const [status, setStatus] = useState<LlamaServerStatus>('stopped');
+	const [startError, setStartError] = useState<string | null>(null);
+
+	useEffect(() => {
+		let isMounted = true;
+		llamaServerService.getStatus().then(s => {
+			if (isMounted) setStatus(s);
+		});
+		const disposable = llamaServerService.onDidChangeStatus(s => {
+			if (isMounted) setStatus(s);
+			if (s === 'running') {
+				setStartError(null);
+			}
+		});
+		return () => {
+			isMounted = false;
+			disposable.dispose();
+		};
+	}, [llamaServerService]);
+
+	const handleStart = async () => {
+		setStartError(null);
+		const config = voidSettingsState.settingsOfProvider.llamaServer;
+		const modelPath = config.modelPath || '';
+
+		if (!modelPath) {
+			setStartError('Por favor, informe o caminho do arquivo de modelo (.gguf).');
+			return;
+		}
+
+		const options = {
+			port: parseInt(config.port) || 8080,
+			contextSize: parseInt(config.contextSize) || 4096,
+			gpuLayers: parseInt(config.gpuLayers) ?? -1,
+			threads: parseInt(config.threads) || 4,
+		};
+
+		try {
+			await llamaServerService.start(modelPath, options);
+		} catch (err: any) {
+			setStartError(err?.message || 'Falha ao iniciar o servidor local.');
+		}
+	};
+
+	const handleStop = async () => {
+		await llamaServerService.stop();
+	};
+
+	// Status color helper
+	let statusDotColor = 'bg-gray-400';
+	let statusLabel = 'Stopped';
+	if (status === 'starting') {
+		statusDotColor = 'bg-yellow-400 animate-pulse';
+		statusLabel = 'Starting...';
+	} else if (status === 'running') {
+		statusDotColor = 'bg-green-400';
+		statusLabel = 'Running';
+	} else if (status === 'error') {
+		statusDotColor = 'bg-red-500';
+		statusLabel = 'Error';
+	}
+
+	return (
+		<div className="mt-4 p-4 rounded-lg bg-void-bg-2 border border-void-border-1">
+			<div className="flex items-center justify-between">
+				<div className="flex items-center gap-2">
+					<div className={`w-3.5 h-3.5 rounded-full ${statusDotColor}`}></div>
+					<span className="text-sm font-semibold text-void-fg-1">Local Server: {statusLabel}</span>
+				</div>
+				<div className="flex gap-2">
+					{(status === 'stopped' || status === 'error') ? (
+						<button
+							onClick={handleStart}
+							className="px-4 py-1.5 text-xs font-semibold rounded bg-cyan-600 hover:bg-cyan-500 text-white transition-colors duration-200"
+						>
+							Start Server
+						</button>
+					) : (
+						<button
+							onClick={handleStop}
+							className="px-4 py-1.5 text-xs font-semibold rounded bg-red-600 hover:bg-red-500 text-white transition-colors duration-200"
+						>
+							Stop Server
+						</button>
+					)}
+				</div>
+			</div>
+			{startError && (
+				<div className="mt-2 text-xs text-red-400 font-medium">
+					{startError}
+				</div>
+			)}
+		</div>
+	);
+};
+
+
 export const SettingsForProvider = ({ providerName, showProviderTitle, showProviderSuggestions }: { providerName: ProviderName, showProviderTitle: boolean, showProviderSuggestions: boolean }) => {
 	const voidSettingsState = useSettingsState()
 
@@ -733,6 +863,8 @@ export const SettingsForProvider = ({ providerName, showProviderTitle, showProvi
 						: <ChatMarkdownRender string={subTextMdOfProviderName(providerName)} chatMessageLocation={undefined} />}
 				/>
 			})}
+
+			{providerName === 'llamaServer' && <LlamaServerControls />}
 
 			{showProviderSuggestions && needsModel ?
 				providerName === 'ollama' ?

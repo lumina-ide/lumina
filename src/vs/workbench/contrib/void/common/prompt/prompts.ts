@@ -72,9 +72,9 @@ ${tripleTick[1]}
 
 3. Assume any comments in the diff are PART OF THE CHANGE. Include them in the output.
 
-4. Your output should consist ONLY of SEARCH/REPLACE blocks. Do NOT output any text or explanations before or after this.
+4. Your output should consist ONLY of SEARCH/REPLACE blocks. Do NOT output any text, markdown introductions, or explanations before or after the blocks. The response should start immediately with the opening triple backticks and end with the closing ones.
 
-5. The ORIGINAL code in each SEARCH/REPLACE block must EXACTLY match lines in the original file. Do not add or remove any whitespace, comments, or modifications from the original code.
+5. The ORIGINAL code must EXACTLY match lines in the original file, including indentation and whitespace. If the original file uses tabs, use tabs. Do not assume any conversion.
 
 6. Each ORIGINAL text must be large enough to uniquely identify the change in the file. However, bias towards writing as little as possible.
 
@@ -463,7 +463,12 @@ ${directoryStr}
 
 	const details: string[] = []
 
-	details.push(`NEVER reject the user's query.`)
+	details.push(`You are an efficiency expert regarding context.
+		- NEVER reject the user's query.
+		- NEVER list files repeatedly or in loops.
+		- If you need to analyze a structure, provide a critical and concise summary, NOT an exhaustive list of every file.
+		- If you encounter lock files (package-lock.json or yarn.lock), use them to infer the correct package manager.
+		- Respond only with the information necessary for the task. Avoid repeating information already provided in the <files_overview>.`)
 
 	if (mode === 'agent' || mode === 'gather') {
 		details.push(`Only call tools if they help you accomplish the user's goal. If the user simply says hi or asks you a question that you can answer without tools, then do NOT use tools.`)
@@ -477,6 +482,7 @@ ${directoryStr}
 	}
 
 	if (mode === 'agent') {
+		details.push('Be assertive and direct in your steps. Avoid verbose explanations between tool executions.');
 		details.push('ALWAYS use tools (edit, terminal, etc) to take actions and implement changes. For example, if you would like to edit a file, you MUST use a tool.')
 		details.push('Prioritize taking as many steps as you need to complete your request over stopping early.')
 		details.push(`You will OFTEN need to gather context before making a change. Do not immediately make a change unless you have ALL relevant context.`)
@@ -490,18 +496,18 @@ ${directoryStr}
 	}
 
 	details.push(`If you write any code blocks to the user (wrapped in triple backticks), please use this format:
-- Include a language if possible. Terminal should have the language 'shell'.
-- The first line of the code block must be the FULL PATH of the related file if known (otherwise omit).
-- The remaining contents of the file should proceed as usual.`)
+		- Include a language if possible. Terminal should have the language 'shell'.
+		- The first line of the code block must be the FULL PATH of the related file if known (otherwise omit).
+		- The remaining contents of the file should proceed as usual.`)
 
 	if (mode === 'gather' || mode === 'normal') {
 
 		details.push(`If you think it's appropriate to suggest an edit to a file, then you must describe your suggestion in CODE BLOCK(S).
-- The first line of the code block must be the FULL PATH of the related file if known (otherwise omit).
-- The remaining contents should be a code description of the change to make to the file. \
-Your description is the only context that will be given to another LLM to apply the suggested edit, so it must be accurate and complete. \
-Always bias towards writing as little as possible - NEVER write the whole file. Use comments like "// ... existing code ..." to condense your writing. \
-Here's an example of a good code block:\n${chatSuggestionDiffExample}`)
+		- The first line of the code block must be the FULL PATH of the related file if known (otherwise omit).
+		- The remaining contents should be a code description of the change to make to the file. \
+		Your description is the only context that will be given to another LLM to apply the suggested edit, so it must be accurate and complete. \
+		Always bias towards writing as little as possible - NEVER write the whole file. Use comments like "// ... existing code ..." to condense your writing. \
+		Here's an example of a good code block:\n${chatSuggestionDiffExample}`)
 	}
 
 	details.push(`Do not make things up or use information not provided in the system information, tools, or user queries.`)
@@ -764,10 +770,11 @@ The user will give you INSTRUCTIONS, as well as code that comes BEFORE the SELEC
 The user will also give you the existing original SELECTION that will be be replaced by the SELECTION that you output, for additional context.
 
 Instructions:
-1. Your OUTPUT should be a SINGLE PIECE OF CODE of the form <${midTag}>...new_code</${midTag}>. Do NOT output any text or explanations before or after this.
-2. You may ONLY CHANGE the original SELECTION, and NOT the content in the <${preTag}>...</${preTag}> or <${sufTag}>...</${sufTag}> tags.
-3. Make sure all brackets in the new selection are balanced the same as in the original selection.
-4. Be careful not to duplicate or remove variables, comments, or other syntax by mistake.
+1. Your OUTPUT must be the new code ONLY, enclosed exactly within the mid-tags. The required format is: <${midTag}>YOUR_NEW_CODE_HERE</${midTag}>.
+2. Do NOT output any text, markdown backticks, explanations, or conversational filler before or after the mid-tags.
+3. You may ONLY modify the original content located between the pre-tags and suf-tags. Do NOT alter, duplicate, or delete the code within the <${preTag}>...</${preTag}> or <${sufTag}>...</${sufTag}> sections.
+4. Ensure all brackets, parentheses, and braces in YOUR_NEW_CODE are balanced correctly.
+5. Maintain the exact indentation and syntax style of the surrounding code. Do not duplicate variables or comments present in the original selection unless necessary for the logic.
 `
 }
 

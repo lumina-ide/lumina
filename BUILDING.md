@@ -167,12 +167,26 @@ npm run gulp vscode-win32-x64-inno-updater
 npm run gulp vscode-win32-x64-system-setup
 ```
 
-### Outras plataformas (apenas portátil, sem instalador)
+### Outras plataformas (macOS & Linux)
+
+#### macOS (Apenas Portátil)
+```bash
+npm run gulp vscode-darwin-arm64   # Apple Silicon
+npm run gulp vscode-darwin-x64     # Intel
+```
+
+#### Linux (Portátil e Instaladores .deb / .rpm)
+*Nota: Para compilar os pacotes .deb e .rpm, você deve estar executando no Linux (ou WSL/Docker) e possuir as ferramentas `fakeroot`, `dpkg` e `rpm` instaladas.*
 
 ```bash
-npm run gulp vscode-darwin-arm64   # macOS Apple Silicon
-npm run gulp vscode-darwin-x64     # macOS Intel
-npm run gulp vscode-linux-x64      # Linux
+# Versão portátil (sem instalador)
+npm run gulp vscode-linux-x64
+
+# Pacote Debian/Ubuntu (.deb)
+npm run gulp vscode-linux-x64-build-deb
+
+# Pacote RedHat/Fedora (.rpm)
+npm run gulp vscode-linux-x64-build-rpm
 ```
 
 ---

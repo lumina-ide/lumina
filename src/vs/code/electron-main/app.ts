@@ -133,6 +133,9 @@ import { LLMMessageChannel } from '../../workbench/contrib/void/electron-main/se
 import { VoidSCMService } from '../../workbench/contrib/void/electron-main/voidSCMMainService.js';
 import { IVoidSCMService } from '../../workbench/contrib/void/common/voidSCMTypes.js';
 import { MCPChannel } from '../../workbench/contrib/void/electron-main/mcpChannel.js';
+import { ILlamaServerService } from '../../workbench/contrib/void/common/llamaServerService.js';
+import { LlamaServerService } from '../../workbench/contrib/void/electron-main/llamaServerService.js';
+import { LlamaServerChannel } from '../../workbench/contrib/void/electron-main/llamaServerChannel.js';
 /**
  * The main VS Code application. There will only ever be one instance,
  * even if the user starts many instances (e.g. from the command line).
@@ -1105,6 +1108,7 @@ export class CodeApplication extends Disposable {
 		services.set(IMetricsService, new SyncDescriptor(MetricsMainService, undefined, false));
 		services.set(IVoidUpdateService, new SyncDescriptor(VoidMainUpdateService, undefined, false));
 		services.set(IVoidSCMService, new SyncDescriptor(VoidSCMService, undefined, false));
+		services.set(ILlamaServerService, new SyncDescriptor(LlamaServerService, undefined, false));
 
 		// Default Extensions Profile Init
 		services.set(IExtensionsProfileScannerService, new SyncDescriptor(ExtensionsProfileScannerService, undefined, true));
@@ -1253,6 +1257,10 @@ export class CodeApplication extends Disposable {
 		// Lumina added this
 		const mcpChannel = new MCPChannel();
 		mainProcessElectronServer.registerChannel('void-channel-mcp', mcpChannel);
+
+		// Lumina added this for local llama.cpp
+		const llamaServerChannel = new LlamaServerChannel(accessor.get(ILlamaServerService));
+		mainProcessElectronServer.registerChannel('void-channel-llamaServer', llamaServerChannel);
 
 		// Extension Host Debug Broadcasting
 		const electronExtensionHostDebugBroadcastChannel = new ElectronExtensionHostDebugBroadcastChannel(accessor.get(IWindowsMainService));

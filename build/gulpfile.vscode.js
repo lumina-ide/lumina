@@ -371,7 +371,13 @@ function packageTask(platform, arch, sourceFolderName, destinationFolderName, op
 			], { base: '.' }));
 		} else if (platform === 'linux') {
 			all = es.merge(all, gulp.src('resources/linux/code.png', { base: '.' }));
-		} else if (platform === 'darwin') {
+		}
+
+		// Include local llama.cpp binaries and DLLs in resources/llama
+		const llamaBinaries = gulp.src('resources/llama/**', { base: '.', allowEmpty: true });
+		all = es.merge(all, llamaBinaries);
+
+		if (platform === 'darwin') {
 			const shortcut = gulp.src('resources/darwin/bin/code.sh')
 				.pipe(replace('@@APPNAME@@', product.applicationName))
 				.pipe(rename('bin/code'));
