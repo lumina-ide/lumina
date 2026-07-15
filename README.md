@@ -54,6 +54,15 @@ To use local Llama models, you must download the server binaries and place them 
 
 *Note: Lumina dynamically detects your GPU and falls back to Vulkan/CPU if CUDA is not available.*
 
+### ⚠️ Hardware Guidelines & Model Recommendations
+Running models locally requires selecting a model that matches your system's hardware. 
+
+*   **Be Careful with RAM/VRAM:** Local execution loads models directly into your system memory (RAM/VRAM). Running models that are too large for your hardware can freeze your system or cause crashes.
+*   **Hardware Baseline Example:** A system with an **Intel i7 (8th Gen), 16GB RAM, and an NVIDIA GeForce GTX 1660 OC** can comfortably run models up to **4B parameters**. Attempting to run larger models (such as 32B) on this hardware is highly discouraged as it will exceed resource limits.
+*   **Recommended & Tested Models:** We recommend using the following custom-quantized models (quantized in `Q4_K_M` format, which retains the intelligence of the F16 version while drastically reducing memory requirements):
+    *   **Gemma 4B:** [gemma-4-E4B-it-GGUF by armandosds](https://huggingface.co/armandosds/gemma-4-E4B-it-GGUF) (Tested for local agentic workflow)
+    *   **Qwen 3.5 4B:** [qwen3.5-4b-agentic-coder-v4-i1-GGUF by armandosds](https://huggingface.co/armandosds/qwen3.5-4b-agentic-coder-v4-i1-GGUF) (Fine-tuned for agentic code tasks)
+
 ---
 
 ## 🇧🇷 Português
@@ -81,6 +90,15 @@ Para utilizar modelos locais Llama, você precisa baixar as binárias do servido
     *   *Vulkan:* `resources/llama/win32-x64/vulkan/`
 
 *Nota: O Lumina detectará automaticamente a presença de suporte CUDA e reverterá de forma transparente para Vulkan ou CPU caso necessário.*
+
+### ⚠️ Recomendações de Modelos & Diretrizes de Hardware
+A execução local de IA exige a escolha de um modelo compatível com o hardware do seu computador.
+
+*   **Cuidado com a Memória (RAM/VRAM):** A inferência local consome recursos diretamente da sua memória. Tentar executar modelos grandes demais para as suas especificações pode travar o sistema operacional.
+*   **Configuração de Referência:** Um computador equipado com **processador Intel i7 (8ª geração), 16GB de RAM e placa de vídeo NVIDIA GeForce GTX 1660 OC** consegue rodar com ótimo desempenho modelos de até **4B parâmetros**. Tentar rodar modelos muito superiores (como de 32B) nessa configuração irá sobrecarregar os recursos e travar a máquina.
+*   **Modelos Recomendados e Testados:** Indicamos o uso dos seguintes modelos de alta performance, quantizados em `Q4_K_M` (mantêm a inteligência da versão F16 original com consumo de recursos otimizado):
+    *   **Gemma 4B:** [gemma-4-E4B-it-GGUF no HuggingFace](https://huggingface.co/armandosds/gemma-4-E4B-it-GGUF) (Excelente para tarefas gerais do agente local)
+    *   **Qwen 3.5 4B:** [qwen3.5-4b-agentic-coder-v4-i1-GGUF no HuggingFace](https://huggingface.co/armandosds/qwen3.5-4b-agentic-coder-v4-i1-GGUF) (Otimizado e testado para tarefas de código e agentes)
 
 <hr />
 
