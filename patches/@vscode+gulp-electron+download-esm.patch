@@ -1,0 +1,28 @@
+--- a/node_modules/@vscode/gulp-electron/src/download.js
++++ b/node_modules/@vscode/gulp-electron/src/download.js
+@@ -4,7 +4,16 @@ var path = require("path");
+ const fs = require("fs");
+ const { pipeline } = require("node:stream/promises");
+ const { Readable } = require("node:stream");
+-const { downloadArtifact } = require("@electron/get");
++let downloadArtifactFn;
++
++// Função para carregar downloadArtifact dinamicamente
++async function getDownloadArtifact() {
++  if (!downloadArtifactFn) {
++    const mod = await import("@electron/get");
++    downloadArtifactFn = mod.downloadArtifact;
++  }
++  return downloadArtifactFn;
+ }
+ const ProgressBar = require("progress");
+
+@@ -169,6 +178,9 @@ async function download(opts) {
+   let bar;
+
++  // Obter downloadArtifact dinamicamente
++  const downloadArtifact = await getDownloadArtifact();
++
+   if (!opts.version) {
+     throw new Error("Missing version");
+   }

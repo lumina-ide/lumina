@@ -8,7 +8,7 @@ Guia prático para compilar e rodar o Lumina em modo de desenvolvimento.
 
 ### Node.js
 
-Use exatamente a versão `20.18.2` (definida em `.nvmrc`).
+Use exatamente a versão `22.13.0` (definida em `.nvmrc`).
 
 ```bash
 # Com nvm (recomendado)

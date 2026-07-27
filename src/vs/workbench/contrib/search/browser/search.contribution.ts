@@ -24,6 +24,7 @@ import { searchViewIcon } from './searchIcons.js';
 import { SearchView } from './searchView.js';
 import { registerContributions as searchWidgetContributions } from './searchWidget.js';
 import { SymbolsQuickAccessProvider } from './symbolsQuickAccess.js';
+import { SearchEverywhereQuickAccessProvider } from './searchEverywhereQuickAccess.js';
 import { ISearchHistoryService, SearchHistoryService } from '../common/searchHistoryService.js';
 import { SearchViewModelWorkbenchService } from './searchTreeModel/searchModel.js';
 import { ISearchViewModelWorkbenchService } from './searchTreeModel/searchViewModelWorkbenchService.js';
@@ -37,6 +38,7 @@ import './searchActionsCopy.js';
 import './searchActionsFind.js';
 import './searchActionsNav.js';
 import './searchActionsRemoveReplace.js';
+import './searchActionsSearchEverywhere.js';
 import './searchActionsSymbol.js';
 import './searchActionsTopBar.js';
 import './searchActionsTextQuickAccess.js';
@@ -118,6 +120,18 @@ quickAccessRegistry.registerQuickAccessProvider({
 			commandCenterOrder: 25,
 		}
 	]
+});
+
+quickAccessRegistry.registerQuickAccessProvider({
+	ctor: SearchEverywhereQuickAccessProvider,
+	prefix: SearchEverywhereQuickAccessProvider.PREFIX,
+	placeholder: nls.localize('searchEverywhereAll', "Search everything... (@ for symbols, # for classes, > for commands, : for line)"),
+	contextKey: 'inSearchEverywherePicker',
+	helpEntries: [{
+		description: nls.localize('searchEverywhere', "Search Everywhere"),
+		commandId: 'workbench.action.searchEverywhere',
+		commandCenterOrder: 12
+	}]
 });
 
 // Configuration
@@ -378,6 +392,16 @@ configurationRegistry.registerConfiguration({
 			type: 'boolean',
 			description: nls.localize('search.quickAccess.preserveInput', "Controls whether the last typed input to Quick Search should be restored when opening it the next time."),
 			default: false
+		},
+		'searchEverywhere.includeNonProjectItems': {
+			type: 'boolean',
+			description: nls.localize('searchEverywhere.includeNonProjectItems', "Controls whether Search Everywhere includes results from non-project items such as node_modules and external dependencies."),
+			default: false
+		},
+		'searchEverywhere.maxResults': {
+			type: 'number',
+			default: 512,
+			description: nls.localize('searchEverywhere.maxResults', "Controls the maximum number of results shown in Search Everywhere.")
 		},
 		'search.experimental.closedNotebookRichContentResults': {
 			type: 'boolean',
