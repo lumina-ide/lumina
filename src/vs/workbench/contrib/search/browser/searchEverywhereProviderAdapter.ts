@@ -62,35 +62,32 @@ export class SearchEverywhereProviderAdapter {
 			);
 
 			const results: ISearchEverywhereItem[] = [];
-			await this.searchService.textSearch(textQuery, {
-				onResult: (match) => {
-					if (results.length >= 30) {
-						return;
-					}
-					if ('lineNumber' in match) {
-						const lineText = match.preview.text.trim();
-						results.push({
-							label: lineText || basenameOrAuthority(match.resource),
-							description: `${this.labelService.getUriLabel(match.resource, { relative: true })}:${match.lineNumber}`,
-							category: SearchEverywhereCategory.File,
-							iconClass: 'codicon codicon-search',
-							accept: () => {
-								this.editorService.openEditor({
-									resource: match.resource,
-									options: {
-										selection: {
-											startLineNumber: match.lineNumber,
-											startColumn: match.offset,
-											endLineNumber: match.lineNumber,
-											endColumn: match.offset + match.length
-										}
-									}
-								});
-							}
-						});
-					}
+			await this.searchService.textSearch(textQuery, token, (match: any) => {
+				if (results.length >= 30) {
+					return;
 				}
-			}, token);
+				if (match && 'lineNumber' in match) {
+					const lineText = match.preview?.text?.trim() || '';
+					results.push({
+						label: lineText || basenameOrAuthority(match.resource),
+						description: `${this.labelService.getUriLabel(match.resource, { relative: true })}:${match.lineNumber}`,
+						category: SearchEverywhereCategory.File,
+						accept: () => {
+							this.editorService.openEditor({
+								resource: match.resource,
+								options: {
+									selection: {
+										startLineNumber: match.lineNumber,
+										startColumn: match.offset,
+										endLineNumber: match.lineNumber,
+										endColumn: match.offset + match.length
+									}
+								}
+							});
+						}
+					});
+				}
+			});
 
 			return results;
 		} catch (e) {
@@ -134,7 +131,6 @@ export class SearchEverywhereProviderAdapter {
 				label: basenameOrAuthority(res.resource),
 				description: this.labelService.getUriLabel(dirname(res.resource), { relative: true }),
 				category: SearchEverywhereCategory.File,
-				iconClass: 'codicon codicon-file',
 				accept: () => {
 					this.editorService.openEditor({ resource: res.resource });
 				}
@@ -162,7 +158,6 @@ export class SearchEverywhereProviderAdapter {
 				description: pick.description,
 				detail: pick.detail,
 				category: SearchEverywhereCategory.Symbol,
-				iconClass: 'codicon codicon-symbol-method',
 				accept: () => {
 					if (pick.symbol?.location) {
 						this.editorService.openEditor({
@@ -201,7 +196,6 @@ export class SearchEverywhereProviderAdapter {
 				description: pick.description,
 				detail: pick.detail,
 				category: SearchEverywhereCategory.Class,
-				iconClass: 'codicon codicon-symbol-class',
 				accept: () => {
 					if (pick.symbol?.location) {
 						this.editorService.openEditor({
@@ -238,7 +232,6 @@ export class SearchEverywhereProviderAdapter {
 					description: cmd.id,
 					detail: cmd.category,
 					category: SearchEverywhereCategory.Command,
-					iconClass: 'codicon codicon-terminal',
 					accept: () => {
 						this.commandService.executeCommand(cmd.id);
 					}

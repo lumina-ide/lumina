@@ -17,6 +17,7 @@ export interface ISearchEverywhereItem {
 	category: SearchEverywhereCategory;
 	resource?: any;
 	icon?: string;
+	accept?: () => void;
 }
 
 export function getCategoryLabel(category: SearchEverywhereCategory): string {

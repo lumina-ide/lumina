@@ -19,6 +19,9 @@ export const defaultProviderSettings = {
 	deepseek: {
 		apiKey: '',
 	},
+	moonshot: {
+		apiKey: '',
+	},
 	ollama: {
 		endpoint: 'http://127.0.0.1:11434',
 	},
@@ -113,6 +116,10 @@ export const defaultModelsOfProvider = {
 		'grok-3-mini-fast',
 	],
 	gemini: [ // updated 2025/2026
+		'gemini-3.6-pro',
+		'gemini-3.6-flash',
+		'gemini-3.5-pro',
+		'gemini-3.5-flash',
 		'gemini-2.5-pro',
 		'gemini-2.5-flash',
 		'gemini-2.5-flash-lite',
@@ -125,10 +132,17 @@ export const defaultModelsOfProvider = {
 		'deepseek-chat',
 		'deepseek-reasoner',
 	],
+	moonshot: [ // Moonshot AI (Kimi)
+		'kimi-k1.5-preview',
+		'moonshot-v1-128k',
+		'moonshot-v1-32k',
+		'moonshot-v1-8k',
+	],
 	ollama: [],
 	vLLM: [],
 	lmStudio: [],
 	openRouter: [ // updated 2025/2026
+		'moonshotai/kimi-k1.5',
 		'anthropic/claude-opus-4-7',
 		'anthropic/claude-opus-4-5',
 		'anthropic/claude-sonnet-4-5',
@@ -136,6 +150,8 @@ export const defaultModelsOfProvider = {
 		'openai/gpt-5',
 		'openai/gpt-5.5',
 		'openai/o3',
+		'google/gemini-3.6-pro',
+		'google/gemini-3.6-flash',
 		'google/gemini-2.5-pro',
 		'google/gemini-2.5-flash',
 		'deepseek/deepseek-v4-pro',
@@ -1478,6 +1494,7 @@ const modelSettingsOfProvider: { [providerName in ProviderName]: VoidStaticProvi
 
 	// open source models
 	deepseek: deepseekSettings,
+	moonshot: openaiCompatible,
 	groq: groqSettings,
 
 	// open source models + providers (mixture of everything)

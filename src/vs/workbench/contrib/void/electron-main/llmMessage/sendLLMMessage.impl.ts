@@ -150,6 +150,10 @@ const newOpenAICompatibleSDK = async ({ settingsOfProvider, providerName, includ
 		const thisConfig = settingsOfProvider[providerName]
 		return new OpenAI({ baseURL: 'https://api.deepseek.com/v1', apiKey: thisConfig.apiKey, ...commonPayloadOpts })
 	}
+	else if (providerName === 'moonshot') {
+		const thisConfig = settingsOfProvider[providerName]
+		return new OpenAI({ baseURL: 'https://api.moonshot.cn/v1', apiKey: thisConfig.apiKey, ...commonPayloadOpts })
+	}
 	else if (providerName === 'openAICompatible') {
 		const thisConfig = settingsOfProvider[providerName]
 		const headers = parseHeadersJSON(thisConfig.headersJSON)
@@ -944,6 +948,11 @@ export const sendLLMMessageToProviderImplementation = {
 		list: (params) => _openaiCompatibleList(params),
 	},
 	deepseek: {
+		sendChat: (params) => _sendOpenAICompatibleChat(params),
+		sendFIM: null,
+		list: null,
+	},
+	moonshot: {
 		sendChat: (params) => _sendOpenAICompatibleChat(params),
 		sendFIM: null,
 		list: null,
